@@ -1,0 +1,53 @@
+{% extends "books/base.html" %}
+{% block title %}{% if query %}{{ query }} – Search{% else %}Search{% endif %}{% endblock %}
+
+{% block content %}
+<section class="search-hero">
+  <div class="container">
+    <h1 class="book__title current__title">Search</h1>
+    <form class="search-form" method="get" action="{% url 'search' %}" role="search">
+      <input type="search" name="q" value="{{ query }}" placeholder="Title, author or ISBN" aria-label="Search books" maxlength="200" {% if not query %}autofocus{% endif %}>
+      <button type="submit" class="btn-gold">Search</button>
+    </form>
+  </div>
+</section>
+
+{% if query %}
+<section class="search-results">
+  <div class="container">
+    {% with total=page.paginator.count %}
+    <p class="search-results__count">{{ total }} result{{ total|pluralize }} for “{{ query }}”</p>
+    {% endwith %}
+
+    {% if page.object_list %}
+    <ul class="book-grid">
+      {% for book in page.object_list %}
+      <li>
+        <a class="book-card" href="{% url 'book' book.pk %}">
+          <div class="cover cover--ink book-card__cover" style="view-transition-name: cover-{{ book.pk }}">
+            {% if book.image_url %}<img src="{{ book.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
+          </div>
+          <h3 class="book-card__title">{{ book.title }}</h3>
+          <p class="book-card__author">{{ book.author }}</p>
+          {% if book.goodreads_avg_rating %}
+          <p class="book-card__rating"><svg aria-hidden="true"><use href="#i-star"/></svg>{{ book.goodreads_avg_rating|floatformat:1 }}</p>
+          {% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% if page.has_other_pages %}
+    <nav class="pager" aria-label="Pages">
+      {% if page.has_previous %}<a class="btn-ghost" href="?q={{ query|urlencode }}&amp;page={{ page.previous_page_number }}">Previous</a>{% endif %}
+      <span class="pager__info">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="btn-ghost" href="?q={{ query|urlencode }}&amp;page={{ page.next_page_number }}">Next</a>{% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <p class="shelf-empty">No books match that. Try fewer words or just the author's surname.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "books/base.html" %}
+{% block title %}{{ shelf.title }}{% endblock %}
+
+{% block content %}
+<section class="shelf-page">
+  <div class="container">
+
+    <div class="shelf-head">
+      <h1 class="shelf-title">{{ shelf.title }}</h1>
+      <p class="shelf-count">
+        {% if filtered %}{{ entries|length }} of {{ total }} book{{ total|pluralize }}{% else %}{{ total }} book{{ total|pluralize }}{% endif %}
+      </p>
+    </div>
+
+    {% if total %}
+    <!-- A GET form, so the chosen filters stay in the URL. site.js submits it on change. -->
+    <form class="filters" action="{{ request.path }}" method="get">
+      <div class="filters__group">
+        <label class="filters__label" for="f-added">{{ shelf.date_label }}</label>
+        <select class="filters__select" id="f-added" name="added">
+          <option value="">Any time</option>
+          {% for value, label in date_ranges %}
+          <option value="{{ value }}"{% if selected.added == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filters__group">
+        <label class="filters__label" for="f-genre">Genre</label>
+        <select class="filters__select" id="f-genre" name="genre">
+          <option value="">All genres</option>
+          {% for genre in genres %}
+          <option value="{{ genre.slug }}"{% if selected.genre == genre.slug %} selected{% endif %}>{{ genre.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filters__group filters__group--wide">
+        <label class="filters__label" for="f-sort">Sort by</label>
+        <select class="filters__select" id="f-sort" name="sort">
+          {% for value, label, ordering in shelf.sorts %}
+          <option value="{{ value }}"{% if selected.sort == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn-gold filters__submit">Apply</button>
+    </form>
+    {% endif %}
+
+    {% if entries %}
+    <ul class="shelf-grid">
+      {% for entry in entries %}
+      <li>
+        <article class="tbr-card">
+          <a class="tbr-card__link" href="{% url 'book' entry.book.pk %}">
+            <div class="cover tbr-card__cover" style="view-transition-name: cover-{{ entry.book.pk }}">
+              {% if entry.book.image_url %}<img src="{{ entry.book.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
+            </div>
+            <h2 class="tbr-card__title" title="{{ entry.book.title }}">{{ entry.book.title }}</h2>
+            <p class="tbr-card__author">{{ entry.book.author }}</p>
+            {% if shelf_key == "finished" %}
+              <p class="tbr-card__added">{{ shelf.card_label }}{% if entry.date_finished %} {{ entry.date_finished|date:"j M Y" }}{% endif %}</p>
+              {% if entry.rating %}<span class="stars tbr-card__stars" style="--rating: {{ entry.rating }}" role="img" aria-label="Your rating: {{ entry.rating }} out of 5"></span>{% endif %}
+            {% else %}
+              <p class="tbr-card__added">{{ shelf.card_label }} {{ entry.added_at|date:"j M Y" }}</p>
+            {% endif %}
+          </a>
+        </article>
+      </li>
+      {% endfor %}
+    </ul>
+    {% elif filtered %}
+    <p class="shelf-empty">No books match these filters. <a class="link" href="{{ request.path }}">Clear filters</a></p>
+    {% else %}
+    <p class="shelf-empty">{{ shelf.empty }}</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "books/base.html" %}
+{% block title %}Calendar · {{ title }}{% endblock %}
+
+{% block content %}
+<section class="cal-page">
+  <div class="container">
+
+    <div class="cal__toolbar">
+      <a class="btn-outline" href="?view={{ view }}&amp;date={{ today|date:'Y-m-d' }}">Today</a>
+
+      <div class="cal__nav">
+        <a class="cal__arrow" href="?view={{ view }}&amp;date={{ prev|date:'Y-m-d' }}" aria-label="Previous {{ view }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </a>
+        <a class="cal__arrow" href="?view={{ view }}&amp;date={{ next|date:'Y-m-d' }}" aria-label="Next {{ view }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <h1 class="cal__title">{{ title }}</h1>
+
+      <!-- A GET form; site.js submits it when the view changes. -->
+      <form class="cal__view-form" method="get" action="{{ request.path }}">
+        <input type="hidden" name="date" value="{{ anchor|date:'Y-m-d' }}">
+        <select class="cal__view btn-outline" name="view" aria-label="Calendar view">
+          {% for value, label in views %}
+          <option value="{{ value }}"{% if value == view %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn-outline cal__view-submit">Go</button>
+      </form>
+    </div>
+
+    <div class="cal cal--{{ view }}">
+      <div class="cal__weekdays" aria-hidden="true">{% for name in weekdays %}<div>{{ name }}</div>{% endfor %}</div>
+
+      <div class="cal__weeks">
+        {% for row in rows %}
+        <div class="cal__week">
+          <div class="cal__cells" aria-hidden="true">{% for day in row.days %}<div class="cal__cell"></div>{% endfor %}</div>
+          <div class="cal__layout">
+            {% for day in row.days %}
+            <div class="cal__date{% if day.out %} cal__date--out{% endif %}"{% if day.today %} aria-current="date"{% endif %}>
+              {% if day.today %}<span class="cal__today">{{ day.label }}</span>{% else %}{{ day.label }}{% endif %}
+            </div>
+            {% endfor %}
+            {% for bar in row.bars %}
+            <a class="cal__bar cal__bar--{{ bar.colour }}{% if bar.open_start %} cal__bar--open-start{% endif %}{% if bar.open_end %} cal__bar--open-end{% endif %}"
+               href="{% url 'book' bar.entry.book_id %}"
+               style="grid-column: {{ bar.col }} / span {{ bar.span }}; grid-row: {{ bar.row }}; --i: {{ forloop.counter0 }}"
+               title="{{ bar.entry.book.title }} · {{ bar.first|date:'j M' }}{% if bar.last != bar.first %} – {{ bar.last|date:'j M Y' }}{% else %} {{ bar.first|date:'Y' }}{% endif %}{% if bar.reading %} (reading){% endif %}">{{ bar.entry.book.title }}{% if bar.reading %} &middot; Reading{% endif %}</a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if not has_books %}
+    <p class="cal__empty">No reading in this {{ view }}. Add start and finish dates on a book's page and it will show up here.</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

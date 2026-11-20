@@ -1,0 +1,97 @@
+{% extends "books/base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Currently reading -->
+<section class="home-hero">
+  <div class="container">
+    {% if current %}
+    <article class="current">
+      <div class="cover cover--outline current__cover" style="view-transition-name: cover-{{ current.book.pk }}">
+        {% if current.book.image_url %}<img src="{{ current.book.image_url }}" alt="Cover of {{ current.book.title }}">{% else %}Cover{% endif %}
+      </div>
+
+      <div class="current__body">
+        <p class="eyebrow">Currently reading</p>
+        <h1 class="book__title current__title">{{ current.book.title }}</h1>
+        <p class="current__author">{{ current.book.author }}</p>
+        {% if current.date_started %}<p class="current__since">Reading since {{ current.date_started|date:"j F Y" }}</p>{% endif %}
+
+        <div class="current__actions">
+          <form class="current__form" method="post" action="{% url 'finish_book' current.book.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-gold">Mark as finished</button>
+          </form>
+          <a class="btn-ghost" href="{% url 'book' current.book.pk %}">Book page</a>
+        </div>
+      </div>
+    </article>
+
+    {% elif user.is_authenticated %}
+    <article class="current">
+      <div class="current__body">
+        <p class="eyebrow">Currently reading</p>
+        <h1 class="book__title current__title">Nothing on the go</h1>
+        <p class="current__text">Set a book to “Reading” on its page and it will show up here.</p>
+        <div class="current__actions">
+          <a class="btn-ghost" href="{% url 'to_be_read' %}">Your to-read list</a>
+        </div>
+      </div>
+    </article>
+
+    {% else %}
+    <article class="current">
+      <div class="current__body">
+        <p class="eyebrow">Welcome</p>
+        <h1 class="book__title current__title">Track what you read</h1>
+        <p class="current__text">Log in to see what you're reading, what you've finished this year and your favourite genres.</p>
+        <div class="current__actions">
+          <a class="btn-gold" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in</a>
+        </div>
+      </div>
+    </article>
+    {% endif %}
+  </div>
+</section>
+
+{% if user.is_authenticated %}
+<section class="home-shelves">
+  <div class="container">
+    <h2 class="section__title">Finished this year</h2>
+
+    {% if read_this_year %}
+    <ul class="book-grid">
+      {% for entry in read_this_year %}
+      <li>
+        <a class="book-card" href="{% url 'book' entry.book.pk %}">
+          <div class="cover cover--ink book-card__cover" style="view-transition-name: cover-{{ entry.book.pk }}">
+            {% if entry.book.image_url %}<img src="{{ entry.book.image_url }}" alt="">{% else %}Cover{% endif %}
+          </div>
+          <h3 class="book-card__title">{{ entry.book.title }}</h3>
+          <p class="book-card__author">{{ entry.book.author }}</p>
+          {% if entry.book.goodreads_avg_rating %}
+          <p class="book-card__rating"><svg aria-hidden="true"><use href="#i-star"/></svg>{{ entry.book.goodreads_avg_rating|floatformat:1 }}</p>
+          {% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="shelf-empty">No books finished this year yet.</p>
+    {% endif %}
+
+    <h2 class="section__title section__title--genres">Favourite by genre</h2>
+
+    {% if top_genres %}
+    <ul class="chips">
+      {% for genre in top_genres %}
+      <li><span title="{{ genre.read_count }} book{{ genre.read_count|pluralize }} finished">{{ genre.name }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="shelf-empty">Your favourite genres will appear once you've finished a few books.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

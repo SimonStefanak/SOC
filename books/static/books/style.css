@@ -1,0 +1,1032 @@
+/* =========================================================
+   Tokens
+   Colours, sizes and spacing measured from the Figma frames
+   "Book page - final" and "Home page - final"
+   (1440px wide, 1152px content column).
+   Change a value once here and every page follows.
+   ========================================================= */
+:root {
+  /* palette */
+  --black:  #000000;
+  --white:  #ffffff;
+  --coal:   #171717;   /* nav, reviews section */
+  --slate:  #202628;   /* hero */
+  --mist:   #d7dedf;   /* main text, icons, date field, review cards, book cards */
+  --fog:    #b6bbbc;   /* muted text */
+  /* the homepage frame uses a slightly cooler grey ramp than the book page */
+  --ice:    #f2f5f9;   /* genre chips, "Book page" button */
+  --haze:   #e1e8f0;   /* author line on the currently-reading card */
+  --steel:  #c8d3e0;   /* "Reading since", chip and button outlines, dashed cover */
+  --gold:   #b78600;   /* "Reading" select, your rating, heart, save button, review stars */
+  --gold-ink: #171717; /* text on gold */
+  --hint:   #3b4a63;   /* placeholders */
+  --neutral: #343b3e;  /* shelf select for any status but "Reading" (not in the mockup) */
+  /* the calendar mockup uses its own grey ramp */
+  --cal-text:  #e3e6e8;   /* day numbers, button labels */
+  --cal-dim:   #9aa0a6;   /* weekday headings */
+  --cal-faint: #5f656b;   /* out-of-month days, button outlines */
+  --cal-line:  #343b3e;   /* grid lines */
+  /* one colour per book; gold means "currently reading" */
+  --cal-blue:   #8ab4f8;
+  --cal-green:  #81c995;
+  --cal-purple: #c58af9;
+  --cal-cyan:   #78d9ec;
+
+  /* roles */
+  --bg-nav:     var(--coal);
+  --bg-hero:    var(--slate);
+  --bg-reviews: var(--coal);
+  --bg-footer:  var(--black);
+  --text:        var(--mist);
+  --text-muted:  var(--fog);
+  --text-strong: var(--white);
+  --focus:       var(--mist);
+
+  /* type */
+  --font-ui:    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --fs-xs: 12px;      /* field labels */
+  --fs-sm: 13px;      /* genre pills, hints */
+  --fs-md: 14px;      /* dates, rating count, reviewer name */
+  --fs-body: 15px;    /* nav links, review text, buttons */
+  --fs-ctl: 16px;     /* shelf select */
+  --fs-lg: 18px;
+  --fs-byline: 20px;  /* author, year */
+  --fs-desc: 22px;    /* description */
+  --fs-section: 24px; /* homepage section headings */
+  --fs-h1: 36px;      /* shelf page heading */
+  --fs-xl: 28px;      /* "Reviews" heading */
+  --fs-hero: 32px;    /* currently-reading title */
+  --fs-score: 36px;   /* catalog rating number */
+  --fs-2xl: 52px;     /* book title */
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* shape */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-pill: 999px;
+
+  /* layout */
+  --nav-h: 64px;
+  --gutter: 24px;
+  --content-w: 1152px;
+  --cover-w: 150px;
+  --cover-ratio: 2 / 3;
+  --shelf-w: 240px;
+
+  --ease: 0.15s ease;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-hero);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+main { flex: 1; display: flex; flex-direction: column; }
+
+.container { width: min(100% - 2 * var(--gutter), var(--content-w)); margin-inline: auto; }
+
+/* =========================================================
+   Navigation + footer
+   ========================================================= */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--nav-h);
+  /* content lines up with .container: same side space as the page column below */
+  padding-inline: max(var(--gutter), (100% - var(--content-w)) / 2);
+  background: var(--bg-nav);
+  color: var(--text);
+}
+
+.nav__logo { justify-self: start; display: block; }
+.nav__logo img { display: block; height: 34px; width: auto; }
+
+.nav__links {
+  display: flex;
+  gap: 36px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-body);
+  font-weight: 500;
+}
+.nav__links a { padding: var(--space-1) 0; border-bottom: 2px solid transparent; transition: border-color var(--ease); }
+.nav__links a:hover,
+.nav__links a[aria-current="page"] { border-bottom-color: currentColor; }
+
+.nav__actions { justify-self: end; display: flex; align-items: center; gap: 19px; }
+
+.nav__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.nav__icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+.nav__avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--black);
+}
+.nav__avatar svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+/* footer: brand + tagline on the left, link columns on the right, credits underneath */
+.footer { background: var(--bg-footer); color: var(--text); border-top: 1px solid rgb(255 255 255 / 0.06); }
+.footer__top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-6); padding: 48px 0 30px; }
+
+.footer__logo { display: inline-flex; align-items: center; gap: 10px; color: var(--text-strong); font-size: var(--fs-lg); font-weight: 700; line-height: 1; }
+.footer__logo img { display: block; height: 34px; width: auto; }
+.footer__tagline { margin: 12px 0 0; font-size: var(--fs-md); line-height: 17px; color: var(--text-muted); }
+
+.footer__cols { display: flex; gap: 80px; }
+.footer__heading {
+  margin: 0 0 10px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.footer__links { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: var(--fs-md); line-height: 21px; }
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding: 32px 0;
+  border-top: 1px solid #2e3336;
+  font-size: var(--fs-sm);
+  line-height: 16px;
+  color: var(--text-muted);
+}
+.footer__bottom p { margin: 0; }
+
+/* =========================================================
+   Shared: cover + book text
+   ========================================================= */
+.cover {
+  width: var(--cover-w);
+  aspect-ratio: var(--cover-ratio);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--text);
+  border-radius: 6px;
+  color: var(--text-strong);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  overflow: hidden;
+}
+.cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover:has(img) { border: 0; }
+/* on the homepage the placeholder sits on two different backgrounds */
+.cover--outline { border-color: var(--steel); }
+.cover--ink { border-color: var(--slate); color: var(--slate); }
+
+.book__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 54px;
+}
+.book__author { margin: 0; font-size: var(--fs-byline); }
+
+/* Star display: set --rating (0-5) inline, e.g. style="--rating: 4.7".
+   Outline stars with a filled overlay clipped to the rating.
+   --size is the width of one star tile. */
+.stars {
+  --size: 14px;
+  --star-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' fill='none' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --star-fill: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  position: relative;
+  display: block;
+  width: calc(var(--size) * 5);
+  height: var(--size);
+  color: var(--text);
+}
+.stars::before,
+.stars::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: currentColor;
+  -webkit-mask-size: var(--size) var(--size);
+  mask-size: var(--size) var(--size);
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+.stars::before { right: 0; -webkit-mask-image: var(--star-line); mask-image: var(--star-line); }
+.stars::after  { width: calc(var(--rating) / 5 * 100%); -webkit-mask-image: var(--star-fill); mask-image: var(--star-fill); }
+
+/* =========================================================
+   Book page: hero
+   ========================================================= */
+.book-hero { background: var(--bg-hero); padding: 50px 0 58px; }
+
+.book-hero__inner {
+  display: grid;
+  grid-template-columns: var(--shelf-w) minmax(0, 1fr);
+  column-gap: 54px;
+  align-items: start;
+}
+
+/* ---- left column: cover + your shelf controls ---- */
+.shelf { display: flex; flex-direction: column; gap: 11px; }
+.shelf .cover { --cover-w: 100%; }
+
+.shelf__field { display: flex; flex-direction: column; gap: 4px; }
+.shelf__field--rating { gap: 6px; margin-top: 1px; }
+.shelf__label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 14px;
+  padding-top: 1px;
+  color: var(--text-strong);
+}
+
+/* shelf status select */
+.status {
+  --status-bg: var(--neutral);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 48px;
+  padding: 0 40px 2px 14px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--status-bg);
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 16px top 17px;
+  background-size: 12px;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--fs-ctl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--ease);
+}
+.status[data-status="reading"] {
+  --status-bg: var(--gold);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='%23171717' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  color: var(--gold-ink);
+}
+.status:hover { filter: brightness(1.1); }
+.status option { color: #111; background: #fff; font-weight: 400; }
+
+/* start / finish dates in one field.
+   data-step: "start" = only the start date is shown, "finish" = start + empty finish, "done" = both */
+.dates {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 10px;
+  border: 2px solid var(--white);
+  border-radius: var(--radius-sm);
+  background: var(--mist);
+  color: var(--gold-ink);
+  font-size: var(--fs-md);
+}
+.dates__part { position: relative; flex: 1; min-width: 0; white-space: nowrap; cursor: pointer; }
+.dates__text.is-empty { color: var(--hint); }
+.dates[data-step="start"] .dates__sep,
+.dates[data-step="start"] .dates__part:last-child { display: none; }
+.dates__part input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  color-scheme: light;
+}
+.dates__part:focus-within { outline: 2px solid var(--gold-ink); outline-offset: 2px; border-radius: 4px; }
+
+/* your rating (5 stars) + like (heart) */
+.shelf__rate { display: flex; align-items: flex-end; gap: 22px; }
+.rate { display: flex; gap: 6px; }
+
+.rate__star,
+.like {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.rate__star { width: 30px; height: 28px; }
+/* the heart is taller than the stars: it lines up with their bottom edge and rises above the row */
+.like { width: 37px; height: 34px; margin: -8px 0 2px; }
+
+.rate__star svg,
+.like svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: round;
+}
+.rate__star svg { width: 28px; height: 28px; stroke-width: 2; }
+.like svg { width: 37px; height: 34px; stroke-width: 1.1; overflow: visible; }
+.rate__star.is-on { color: var(--gold); }
+.rate__star.is-on svg { fill: currentColor; }
+.like[aria-pressed="true"] { color: var(--gold); }
+.like[aria-pressed="true"] svg { fill: currentColor; stroke: none; }
+
+/* ---- right column: title, genres, description, community rating ---- */
+.book-info { min-width: 0; }
+
+.book__head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 22px; row-gap: var(--space-1); }
+.book__year { margin: 0 0 0 6px; font-family: var(--font-serif); font-size: var(--fs-byline); }
+/* in Figma the byline sits slightly above the title's baseline */
+.book-info .book__author { position: relative; top: -3px; }
+.book-info .book__year   { position: relative; top: -4px; }
+
+.genres { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 9px 0 0; padding: 0; list-style: none; }
+.genres li {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 14.5px;
+  border: 1px solid var(--text);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+}
+
+.book__desc {
+  margin: 24px 0 0;
+  max-width: 440px;
+  font-family: var(--font-serif);
+  font-size: var(--fs-desc);
+  line-height: 30px;
+}
+
+/* catalog rating: number + stars + count */
+.rating { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+.rating__score { font-size: var(--fs-score); font-weight: 600; line-height: 1; }
+.rating__count { display: block; margin: 3px 0 0 2px; font-size: var(--fs-md); line-height: 1.2; }
+/* larger stars with space between them (the star sits inside a wider tile) */
+.rating .stars {
+  --size: 28px;
+  --star-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 28 28'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' fill='none' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --star-fill: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 28 28'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   Book page: reviews
+   ========================================================= */
+.book-reviews { flex: 1; background: var(--bg-reviews); padding: 48px 0 64px; }
+
+.reviews__title { margin: 0 0 24px; font-size: var(--fs-xl); font-weight: 600; line-height: 34px; color: var(--text); }
+/* 400px form + 720px list at full width, same proportions when narrower */
+.reviews__grid { display: grid; grid-template-columns: minmax(0, 400fr) minmax(0, 720fr); column-gap: 32px; align-items: start; }
+
+.review-form { display: flex; flex-direction: column; }
+.review-form label { margin-bottom: 10px; font-size: var(--fs-body); font-weight: 600; line-height: 18px; color: var(--text); }
+.review-form textarea {
+  width: 100%;
+  height: 160px;
+  padding: 14px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--mist);
+  color: #0d0d0e;
+  font: inherit;
+  font-size: var(--fs-body);
+  line-height: 18px;
+  resize: vertical;
+}
+.review-form textarea::placeholder { color: var(--hint); opacity: 1; }
+.review-form__hint { margin: 10px 0; font-size: var(--fs-sm); line-height: 16px; }
+
+.btn-gold {
+  align-self: flex-start;
+  height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--gold);
+  color: var(--gold-ink);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter var(--ease);
+}
+.btn-gold:hover { filter: brightness(1.06); }
+
+.review-list { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.review { padding: 20px 20px 23px; background: var(--mist); border-radius: var(--radius-xl); color: var(--black); font-size: var(--fs-body); line-height: 18px; }
+.review__head { display: flex; align-items: baseline; justify-content: space-between; }
+.review__name { font-size: var(--fs-md); font-weight: 700; }
+.review .stars { margin: 9px 0 12px; color: var(--gold); }
+.review p { margin: 0; }
+
+/* ---- Django addition: other books in the same series ---- */
+.book-series { background: var(--bg-hero); padding: 0 0 56px; }
+
+/* carousel: one scrolling row; the arrows page through it (site.js) */
+.carousel__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+.carousel__head .section__title { margin: 0; }
+.carousel__nav { display: none; gap: var(--space-2); }
+.js .carousel__nav { display: flex; }
+.carousel.is-static .carousel__nav { visibility: hidden; }   /* everything fits: no arrows */
+.carousel__btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--cal-faint);
+  border-radius: 50%;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.carousel__btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carousel__btn:disabled { opacity: 0.3; cursor: default; }
+
+.carousel__track {
+  --fade-l: 0px;
+  --fade-r: 0px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 190px;
+  gap: var(--space-5);
+  margin: -12px 0;            /* room for the hover lift and shadow, without moving the layout */
+  padding: 12px 0;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
+}
+.carousel__track::-webkit-scrollbar { display: none; }
+.carousel__track > li { scroll-snap-align: start; }
+.carousel.can-left .carousel__track { --fade-l: 48px; }
+.carousel.can-right .carousel__track { --fade-r: 48px; }
+
+/* =========================================================
+   Homepage: "currently reading" band
+   ========================================================= */
+.home-hero { background: var(--bg-hero); padding: 56px 0; }
+
+.current {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px;
+  background: var(--coal);
+  border-radius: 20px;
+}
+.current__cover { --cover-w: 140px; }
+.current__body { min-width: 0; }
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.current__title  { margin: var(--space-2) 0 0; font-size: var(--fs-hero); line-height: 37px; }
+.current__author { margin: var(--space-2) 0 0; font-size: 17px; line-height: 21px; color: var(--haze); }
+.current__since  { margin: var(--space-2) 0 0; font-size: var(--fs-md); line-height: 17px; color: var(--steel); }
+.current__actions { display: flex; gap: var(--space-3); margin-top: 20px; }
+
+/* outlined twin of .btn-gold */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 22px;
+  border: 1.5px solid var(--steel);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--ice);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--ease);
+}
+.btn-ghost:hover { background: rgb(242 245 249 / 0.1); }
+
+/* =========================================================
+   Homepage: shelves ("Finished this year" + "Favourite by genre")
+   ========================================================= */
+.home-shelves { flex: 1; background: var(--bg-reviews); padding: 48px 0 64px; }
+
+.section__title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-section);
+  font-weight: 600;
+  line-height: 29px;
+  color: var(--text-strong);
+}
+.section__title--genres { margin-top: 48px; }
+
+/* six 175px cards at full width; fewer as the screen narrows */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-card {
+  display: block;
+  height: 100%;
+  padding: 10px;
+  background: var(--mist);
+  border-radius: var(--radius-xl);
+  color: var(--slate);
+  transition: filter var(--ease);
+}
+.book-card:hover { filter: brightness(1.05); }
+.book-card__cover  { --cover-w: 100%; }
+.book-card__title  { margin: 11px 0 0; font-size: var(--fs-md); font-weight: 700; line-height: 17px; }
+.book-card__author { margin: 3px 0 0; font-size: var(--fs-xs); line-height: 15px; }
+.book-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 15px;
+  color: var(--gold);
+}
+.book-card__rating svg { width: 11px; height: 11px; fill: currentColor; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.chips a {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 21px;
+  border: 1px solid var(--steel);
+  border-radius: 20px;
+  font-size: var(--fs-body);
+  color: var(--ice);
+  transition: background-color var(--ease);
+}
+.chips a:hover { background: rgb(242 245 249 / 0.1); }
+
+/* =========================================================
+   Shelf pages ("To read", "Finished")
+   ========================================================= */
+.shelf-page { flex: 1; background: var(--bg-hero); padding: 40px 0 64px; }
+
+.shelf-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); }
+.shelf-title { margin: 0; font-size: var(--fs-h1); font-weight: 700; line-height: 44px; color: var(--text); }
+.shelf-count { margin: 0; font-size: var(--fs-body); line-height: 18px; color: var(--text-muted); }
+
+/* a GET form, so the chosen filters stay in the URL */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: max-content;
+  max-width: 100%;
+  margin-top: var(--space-5);
+  padding: var(--space-3);
+  background: var(--coal);
+  border-radius: var(--radius-xl);
+}
+.filters__group { display: flex; flex-direction: column; gap: var(--space-1); width: 170px; }
+.filters__group--wide { width: 200px; }
+.filters__label { font-size: var(--fs-xs); font-weight: 700; line-height: 15px; color: var(--text); }
+
+.filters__select {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;
+  padding: 0 36px 0 12px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--mist);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6l4.5 4.5L12.5 6' fill='none' stroke='%23171717' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  color: var(--gold-ink);
+  font: inherit;
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+.filters__select option { color: #111; background: #fff; }
+
+/* five 211px cards at full width; fewer as the screen narrows */
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--space-5);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tbr-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-3);
+  background: var(--coal);
+  border-radius: var(--radius-xl);
+}
+.tbr-card__link { display: block; color: inherit; }
+.tbr-card__link:hover .tbr-card__title { text-decoration: underline; }
+.tbr-card__cover { --cover-w: 100%; }
+.tbr-card__title {
+  margin: 11px 0 0;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 19px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tbr-card__author,
+.tbr-card__added { margin: 0; font-size: var(--fs-xs); line-height: 17px; color: var(--text-muted); }
+
+/* ---- Django additions for the shelf pages ---- */
+/* your rating on "Finished" cards */
+.tbr-card__stars { margin-top: var(--space-1); color: var(--gold); }
+/* "Apply" is only needed without JavaScript (site.js submits on change) */
+.filters__submit { align-self: flex-end; height: 44px; }
+.js .filters__submit { display: none; }
+.shelf-page .shelf-empty { margin-top: var(--space-5); }
+
+/* =========================================================
+   Calendar
+   Measured from the "Calendar" mockup (1440 wide, 1152 content column).
+   ========================================================= */
+.cal-page { flex: 1; background: var(--bg-hero); padding: 40px 0 64px; }
+
+/* ---- toolbar ---- */
+.cal__toolbar { display: flex; align-items: center; gap: var(--space-2); height: 36px; }
+.cal__nav { display: flex; align-items: center; gap: var(--space-2); }
+.cal__title {
+  margin: 0 auto 0 0;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 36px;
+  color: var(--text-strong);
+}
+
+/* outlined pill, shared by "Today" and the view picker */
+.btn-outline {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--cal-faint);
+  border-radius: 6px;
+  background: none;
+  color: var(--cal-text);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--ease);
+}
+.btn-outline:hover { background: rgb(215 222 223 / 0.08); }
+
+.cal__view {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  padding: 0 38px 0 17px;
+  text-align: left;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6l4.5 4.5L12.5 6' fill='none' stroke='%23e3e6e8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 17px center;
+  background-size: 16px;
+}
+.cal__view option { color: #111; background: #fff; }
+
+.cal__arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--cal-text);
+  cursor: pointer;
+  transition: background-color var(--ease);
+}
+.cal__arrow:hover { background: rgb(215 222 223 / 0.08); }
+.cal__arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- month grid ---- */
+.cal { margin-top: 16px; }
+
+.cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding-bottom: 15px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--cal-dim);
+}
+
+.cal__weeks { border: 1px solid var(--cal-line); border-bottom: 0; }
+
+/* each week stacks a border layer under a content grid, so one bar can span
+   several days while the day cells keep their own borders */
+.cal__week { position: relative; min-height: 128px; }
+.cal__cells { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal__cell { border-right: 1px solid var(--cal-line); border-bottom: 1px solid var(--cal-line); }
+.cal__cell:last-child { border-right: 0; }
+
+.cal__layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 36px repeat(3, 26px);
+}
+
+.cal__date {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 3px;
+  font-size: var(--fs-md);
+  line-height: 1;
+  color: var(--cal-text);
+}
+.cal__date--out { color: var(--cal-faint); }
+
+.cal__today {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-weight: 600;
+}
+
+/* ---- book bars ---- */
+.cal__bar {
+  align-self: start;
+  min-width: 0;
+  height: 22px;
+  margin: 0 4px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--cal-bar, var(--mist));
+  color: var(--coal);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: filter var(--ease);
+}
+.cal__bar:hover { filter: brightness(1.08); }
+/* a book that runs past the end of the week keeps going, so that end sits flush */
+.cal__bar--open-start { margin-left: 1px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.cal__bar--open-end { margin-right: 1px; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+.cal__bar--blue    { --cal-bar: var(--cal-blue); }
+.cal__bar--green   { --cal-bar: var(--cal-green); }
+.cal__bar--purple  { --cal-bar: var(--cal-purple); }
+.cal__bar--cyan    { --cal-bar: var(--cal-cyan); }
+.cal__bar--reading { --cal-bar: var(--gold); }
+
+/* ---- Django additions for the calendar ---- */
+a.btn-outline { display: inline-flex; align-items: center; }
+.cal__view-form { display: flex; margin: 0; }
+.cal__view-submit { margin-left: var(--space-2); }
+.js .cal__view-submit { display: none; }    /* site.js submits on change */
+/* more than three books in a week: extra rows grow the week instead of overflowing */
+.cal__layout { grid-auto-rows: 26px; padding-bottom: 6px; }
+/* week view: one tall row; day view: a single column */
+.cal--week .cal__week { min-height: 360px; }
+.cal--day .cal__weekdays,
+.cal--day .cal__cells,
+.cal--day .cal__layout { grid-template-columns: 1fr; }
+.cal--day .cal__week { min-height: 360px; }
+.cal--day .cal__date { justify-content: flex-start; padding-left: var(--space-3); }
+.cal__empty { margin: var(--space-4) 0 0; color: var(--text-muted); }
+
+/* =========================================================
+   Homepage: Django additions (empty states, inline form)
+   ========================================================= */
+.current__form { display: contents; }
+.current__text { margin: var(--space-2) 0 0; font-size: var(--fs-body); color: var(--steel); }
+.shelf-empty { margin: 0; color: var(--text-muted); }
+/* chips without a page to link to yet */
+.chips span {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 19.5px;
+  border: 1px solid var(--steel);
+  border-radius: 20px;
+  font-size: var(--fs-body);
+  color: var(--ice);
+}
+
+/* =========================================================
+   Django additions (not in the static mockup)
+   ========================================================= */
+
+/* the avatar is a logout button when signed in */
+.nav__form { display: flex; margin: 0; }
+button.nav__avatar { padding: 0; border: 0; font: inherit; cursor: pointer; }
+
+/* flash messages under the nav ("Review saved.", errors) */
+.messages { margin: 0; padding: 0; list-style: none; }
+.messages li {
+  padding: var(--space-2) var(--gutter);
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-weight: 600;
+  text-align: center;
+}
+.messages li.error { background: #b3261e; color: var(--white); }
+
+/* background-save feedback under the rating */
+.shelf__msg { min-height: 18px; margin: 0; font-size: var(--fs-xs); color: var(--text-muted); }
+.shelf__msg.is-error { color: #ff8a80; }
+
+/* "Log in to track this book" (logged out) */
+a.btn-gold { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.shelf__login { align-self: stretch; margin-top: 1px; }
+
+/* logged-out review column, empty review list */
+.review-form__label { margin-bottom: 10px; font-size: var(--fs-body); font-weight: 600; line-height: 18px; }
+.link { text-decoration: underline; text-underline-offset: 2px; }
+.reviews__empty { margin: 0; color: var(--text-muted); }
+
+/* login page */
+.auth { flex: 1; padding: 50px 0 58px; background: var(--bg-hero); }
+.auth__title { margin: 0 0 var(--space-5); font-family: var(--font-serif); font-size: 40px; line-height: 1.1; }
+.auth__form { display: flex; flex-direction: column; gap: var(--space-2); max-width: 360px; }
+.auth__form label { margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 700; color: var(--text-strong); }
+.auth__form input {
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--mist);
+  color: #0d0d0e;
+  font: inherit;
+}
+.auth__form .btn-gold { margin-top: var(--space-4); }
+.form-error { margin: 0 0 var(--space-4); color: #ff8a80; }
+
+/* =========================================================
+   Search page
+   ========================================================= */
+.search-hero { background: var(--bg-hero); padding: 48px 0 40px; }
+.search-form { display: flex; gap: var(--space-3); max-width: 720px; }
+.search-form input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--mist);
+  color: #0d0d0e;
+  font: inherit;
+  font-size: var(--fs-ctl);
+}
+.search-form input::placeholder { color: var(--hint); opacity: 1; }
+.search-form .btn-gold { height: 48px; }
+.search-results { flex: 1; background: var(--bg-reviews); padding: 40px 0 64px; }
+.search-results__count { margin: 0 0 var(--space-4); color: var(--text-muted); }
+.pager { display: flex; align-items: center; justify-content: center; gap: var(--space-4); margin-top: var(--space-6); }
+.pager__info { color: var(--text-muted); }
+
+/* =========================================================
+   Small screens
+   ========================================================= */
+@media (max-width: 760px) {
+  :root { --gutter: var(--space-4); --nav-h: 56px; }
+  .nav { grid-template-columns: auto 1fr auto; padding: 0 var(--gutter); }
+  .nav__logo img { height: 28px; }
+  .nav__links { gap: var(--space-4); justify-content: center; font-size: var(--fs-sm); }
+  .nav__actions { gap: var(--space-2); }
+
+  .book-hero { padding: var(--space-5) 0 var(--space-6); }
+  .book-hero__inner { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
+  .shelf { max-width: var(--shelf-w); }
+  .book__title { font-size: 36px; }
+  .book__desc { max-width: none; font-size: var(--fs-lg); line-height: 1.45; }
+
+  .book-reviews { padding: var(--space-6) 0; }
+  .reviews__grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
+  .book-series { padding: 0 0 var(--space-6); }
+  .carousel__track { grid-auto-columns: 140px; gap: var(--space-3); }
+
+  .home-hero { padding: var(--space-6) 0; }
+  .current { flex-direction: column; align-items: stretch; gap: var(--space-5); padding: var(--space-5); }
+  .current__cover { --cover-w: 140px; }
+  .current__title { font-size: 28px; line-height: 1.15; }
+  .current__actions { flex-wrap: wrap; }
+
+  .home-shelves { padding: var(--space-6) 0 var(--space-5); }
+  .section__title { font-size: var(--fs-byline); line-height: 1.2; }
+  .section__title--genres { margin-top: var(--space-6); }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
+  .search-hero { padding: var(--space-6) 0 var(--space-5); }
+  .chips a, .chips span { height: 38px; padding: 0 16px; font-size: var(--fs-sm); }
+
+  .shelf-page { padding: var(--space-5) 0 var(--space-6); }
+  .shelf-title { font-size: var(--fs-section); line-height: 1.2; }
+  .filters { width: 100%; gap: var(--space-2); }
+  .filters__group,
+  .filters__group--wide { width: auto; flex: 1 1 150px; }
+  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
+
+  /* the month grid can't usefully shrink to phone width, so it scrolls sideways */
+  .cal-page { padding: var(--space-5) 0 var(--space-6); }
+  .cal__toolbar { flex-wrap: wrap; height: auto; row-gap: var(--space-3); }
+  .cal__title { order: -1; flex: 1 0 100%; margin: 0; font-size: var(--fs-byline); line-height: 1.2; }
+  .cal__view-form { margin-left: auto; }
+  .cal { overflow-x: auto; }
+  .cal--month .cal__weekdays,
+  .cal--month .cal__weeks,
+  .cal--week .cal__weekdays,
+  .cal--week .cal__weeks { min-width: 620px; }
+
+  .footer__top { flex-direction: column; padding: var(--space-6) 0 var(--space-5); }
+  .footer__cols { gap: 48px; }
+  .footer__bottom { flex-direction: column; padding: var(--space-5) 0; }
+}
+
+@media (max-width: 480px) {
+  .book-grid,
+  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}

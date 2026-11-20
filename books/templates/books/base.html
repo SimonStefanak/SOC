@@ -1,0 +1,110 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Books{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="{% static 'books/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'books/style.css' %}">
+  <link rel="stylesheet" href="{% static 'books/motion.css' %}">
+  <script>document.documentElement.classList.add("js");</script>
+  <script src="{% static 'books/site.js' %}" defer></script>
+</head>
+<body>
+
+  <!-- Icon sprite (used by the interactive rating stars and heart) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+    </symbol>
+    <symbol id="i-heart" viewBox="2 3 20 18.35" overflow="visible">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/>
+    </symbol>
+  </svg>
+
+  <header class="nav">
+    <a class="nav__logo" href="{% url 'home' %}" aria-label="Home"><img src="{% static 'books/logo.svg' %}" alt=""></a>
+
+    <nav aria-label="Main">
+      <ul class="nav__links">
+        {% url 'to_be_read' as to_read_url %}
+        <li><a href="{{ to_read_url }}"{% if request.path == to_read_url %} aria-current="page"{% endif %}>To read</a></li>
+        {% url 'calendar' as calendar_url %}
+        <li><a href="{{ calendar_url }}"{% if request.path == calendar_url %} aria-current="page"{% endif %}>Calendar</a></li>
+        {% url 'finished' as finished_url %}
+        <li><a href="{{ finished_url }}"{% if request.path == finished_url %} aria-current="page"{% endif %}>Finished</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav__actions">
+      <a class="nav__icon" href="{% url 'search' %}" aria-label="Search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+      </a>
+      {% if user.is_authenticated %}
+      <form class="nav__form" method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="nav__avatar" type="submit" aria-label="Log out {{ user.username }}" title="Log out {{ user.username }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        </button>
+      </form>
+      {% else %}
+      <a class="nav__avatar" href="{% url 'login' %}?next={{ request.path|urlencode }}" aria-label="Log in" title="Log in">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      </a>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <a class="footer__logo" href="{% url 'home' %}">
+            <img src="{% static 'books/logo.svg' %}" alt="">
+            <span>BookLog</span>
+          </a>
+          <p class="footer__tagline">A diary for your bookshelf.</p>
+        </div>
+
+        <nav class="footer__cols" aria-label="Footer">
+          <div>
+            <h2 class="footer__heading">Your books</h2>
+            <ul class="footer__links">
+              <li><a href="{% url 'to_be_read' %}">To read</a></li>
+              <li><a href="{% url 'calendar' %}">Calendar</a></li>
+              <li><a href="{% url 'finished' %}">Finished</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2 class="footer__heading">Project</h2>
+            <ul class="footer__links">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Data sources</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div class="footer__bottom">
+        <p>© {% now "Y" %} BookLog · SOC project</p>
+        <p>Book data: Goodreads · Covers: Goodreads</p>
+      </div>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

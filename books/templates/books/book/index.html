@@ -1,0 +1,173 @@
+{% extends "books/base.html" %}
+{% load static book_extras %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<section class="book-hero">
+  <div class="container book-hero__inner">
+
+    <!-- Left: cover + your shelf controls -->
+    <div class="shelf">
+      <div class="cover" style="view-transition-name: cover-{{ book.pk }}">
+        {% if book.image_url %}<img src="{{ book.image_url }}" alt="Cover of {{ book.title }}">{% else %}Cover{% endif %}
+      </div>
+
+      {% if user.is_authenticated %}
+      <!-- These controls belong to the review form below (form="book-form") and save on change. -->
+      <select class="status" id="status" name="status" form="book-form" data-status="{{ entry.status }}" aria-label="Shelf">
+        <option value="">Add to shelf</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}"{% if entry.status == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- One field for both dates: Started -> Finished -> "Started – Finished" (see script.js) -->
+      <div class="shelf__field">
+        <span class="shelf__label" id="dates-label">{% if dates_step == "done" %}Started – Finished{% elif dates_step == "finish" %}Finished{% else %}Started{% endif %}</span>
+        <div class="dates" id="dates" data-step="{{ dates_step }}" role="group" aria-labelledby="dates-label">
+          <div class="dates__part">
+            {% if entry.date_started %}<span class="dates__text">{{ entry.date_started|date:"d/m/Y" }}</span>{% else %}<span class="dates__text is-empty">dd/mm/yyyy</span>{% endif %}
+            <input type="date" id="started" name="date_started" form="book-form" value="{{ entry.date_started|date:'Y-m-d' }}" aria-label="Start date">
+          </div>
+          <span class="dates__sep" aria-hidden="true">–</span>
+          <div class="dates__part">
+            {% if entry.date_finished %}<span class="dates__text">{{ entry.date_finished|date:"d/m/Y" }}</span>{% else %}<span class="dates__text is-empty">dd/mm/yyyy</span>{% endif %}
+            <input type="date" id="finished" name="date_finished" form="book-form" value="{{ entry.date_finished|date:'Y-m-d' }}" aria-label="Finish date">
+          </div>
+        </div>
+      </div>
+
+      <div class="shelf__field shelf__field--rating">
+        <span class="shelf__label" id="rating-label">Your rating</span>
+        <div class="shelf__rate">
+          <div class="rate" role="group" aria-labelledby="rating-label">
+            {% for i, on in entry.rating|star_range %}
+            <button type="button" class="rate__star{% if on %} is-on{% endif %}" data-value="{{ i }}" aria-label="{{ i }} star{{ i|pluralize }}" aria-pressed="{% if i == entry.rating %}true{% else %}false{% endif %}"><svg aria-hidden="true"><use href="#i-star"/></svg></button>
+            {% endfor %}
+          </div>
+          <button type="button" class="like" id="like-btn" aria-label="Like this book" aria-pressed="{% if entry.favorite %}true{% else %}false{% endif %}">
+            <svg aria-hidden="true"><use href="#i-heart"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <p class="shelf__msg" id="shelf-msg" role="status" aria-live="polite"></p>
+      {% else %}
+      <a class="btn-gold shelf__login" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in to track this book</a>
+      {% endif %}
+    </div>
+
+    <!-- Right: book info -->
+    <div class="book-info">
+      <div class="book__head">
+        <h1 class="book__title">{{ book.title }}</h1>
+        <p class="book__author">by {{ book.author }}</p>
+        {% if book.original_publication_year is not None %}<p class="book__year">({{ book.original_publication_year|pub_year }})</p>{% endif %}
+      </div>
+
+      {% if genres %}
+      <ul class="genres" aria-label="Genres">
+        {% for genre in genres %}<li>{{ genre.name }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+
+      <p class="book__desc">
+        {% if book.description %}{{ book.description|linebreaksbr }}{% else %}<em>No description yet.</em>{% endif %}
+      </p>
+
+      {% if book.goodreads_avg_rating %}
+      <div class="rating">
+        <span class="rating__score">{{ book.goodreads_avg_rating|floatformat:1 }}</span>
+        <div>
+          <span class="stars" style="--rating: {{ book.goodreads_avg_rating|floatformat:'2u' }}" role="img" aria-label="{{ book.goodreads_avg_rating|floatformat:1 }} out of 5 stars"></span>
+          <span class="rating__count">{{ book.goodreads_ratings_count|short_number }} catalog ratings</span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if series_books %}
+<section class="book-series">
+  <div class="container carousel" data-carousel>
+    <div class="carousel__head">
+      <h2 class="section__title">More from {{ book.series.name }}</h2>
+      <div class="carousel__nav">
+        <button type="button" class="carousel__btn" data-carousel-prev aria-label="Previous books">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button type="button" class="carousel__btn" data-carousel-next aria-label="More books">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <ul class="carousel__track">
+      {% for other in series_books %}
+      <li>
+        <article class="tbr-card">
+          <a class="tbr-card__link" href="{% url 'book' other.pk %}">
+            <div class="cover tbr-card__cover" style="view-transition-name: cover-{{ other.pk }}">
+              {% if other.image_url %}<img src="{{ other.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
+            </div>
+            <h3 class="tbr-card__title" title="{{ other.title }}">{{ other.title }}</h3>
+            <p class="tbr-card__author">{{ other.author }}</p>
+            <p class="tbr-card__added">{% if other.series_position %}Book {{ other.series_position }}{% endif %}{% if other.series_position and other.goodreads_avg_rating %} · {% endif %}{% if other.goodreads_avg_rating %}★ {{ other.goodreads_avg_rating|floatformat:1 }}{% endif %}</p>
+          </a>
+        </article>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<section class="book-reviews">
+  <div class="container">
+    <h2 class="reviews__title">Reviews</h2>
+
+    <div class="reviews__grid">
+      {% if user.is_authenticated %}
+      <form class="review-form" id="book-form" action="{{ request.path }}" method="post">
+        {% csrf_token %}
+        <!-- Filled in by the stars and heart on the book card (script.js) -->
+        <input type="hidden" name="rating" id="rating-input" value="{{ entry.rating|default_if_none:'' }}">
+        <input type="hidden" name="favorite" id="favorite-input" value="{% if entry.favorite %}true{% else %}false{% endif %}">
+
+        <label for="review">Your review</label>
+        <textarea id="review" name="review_text" placeholder="What did you think?">{{ entry.review_text|default_if_none:'' }}</textarea>
+        <p class="review-form__hint">Your rating comes from the stars on the book card.</p>
+        <button type="submit" class="btn-gold">Save review</button>
+      </form>
+      {% else %}
+      <div class="review-form">
+        <span class="review-form__label">Your review</span>
+        <p class="review-form__hint"><a class="link" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in</a> to rate and review this book.</p>
+      </div>
+      {% endif %}
+
+      {% if reviews %}
+      <ul class="review-list">
+        {% for r in reviews %}
+        <li class="review">
+          <div class="review__head">
+            <strong class="review__name">{{ r.user.get_full_name|default:r.user.username }}</strong>
+            <time class="review__date" datetime="{{ r.updated_at|date:'Y-m-d' }}">{{ r.updated_at|date:"j M Y" }}</time>
+          </div>
+          {% if r.rating %}<span class="stars" style="--rating: {{ r.rating }}" role="img" aria-label="{{ r.rating }} out of 5 stars"></span>{% endif %}
+          <p>{{ r.review_text|linebreaksbr }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="reviews__empty">No reviews from other readers yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'books/script.js' %}" defer></script>
+{% endblock %}

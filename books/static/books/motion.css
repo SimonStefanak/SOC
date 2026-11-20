@@ -1,0 +1,398 @@
+/* =========================================================
+   Motion & polish
+   Loaded after style.css. Everything that moves, fades, lifts
+   or glows lives here, so style.css stays the measured design.
+   Remove the <link> to motion.css in base.html to turn it all off.
+   ========================================================= */
+:root {
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);    /* quick start, soft landing */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* small overshoot, for "pops" */
+  --dur-1: 120ms;  /* presses */
+  --dur-2: 200ms;  /* hovers, colour changes */
+  --dur-3: 320ms;  /* lifts, underlines */
+  --dur-4: 560ms;  /* entrances, image fades */
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.25), 0 4px 12px rgb(0 0 0 / 0.18);
+  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.22), 0 14px 32px rgb(0 0 0 / 0.34);
+  --ring: 0 0 0 3px rgb(183 134 0 / 0.5);
+
+  /* gold glow: a warmer, brighter gold than --gold, so the halo reads on dark backgrounds */
+  --glow-rgb: 222 166 24;
+  --glow-sm: 0 0 10px rgb(var(--glow-rgb) / 0.3);
+  --glow-md: 0 0 16px rgb(var(--glow-rgb) / 0.38);
+  --glow-lg: 0 0 26px rgb(var(--glow-rgb) / 0.5);
+  --glow-icon: drop-shadow(0 0 4px rgb(var(--glow-rgb) / 0.55));
+  --glow-icon-lg: drop-shadow(0 0 7px rgb(var(--glow-rgb) / 0.7));
+  --glow-text: 0 0 12px rgb(var(--glow-rgb) / 0.45);
+
+  /* every existing "transition: ... var(--ease)" in style.css gets the softer curve */
+  --ease: var(--dur-2) var(--ease-out);
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: #3a4346 var(--coal);
+  -webkit-tap-highlight-color: transparent;
+}
+body { text-rendering: optimizeLegibility; }
+::selection { background: rgb(183 134 0 / 0.55); color: var(--white); }
+
+/* ---------- keyframes ---------- */
+@keyframes rise      { from { opacity: 0; transform: translateY(12px); } }
+@keyframes fade      { from { opacity: 0; } }
+@keyframes slide-in  { from { opacity: 0; transform: translateX(-6px); } }
+@keyframes drop-in   { from { opacity: 0; transform: translateY(-100%); } }
+@keyframes fill-in   { from { width: 0; } }
+@keyframes pop       { 0% { transform: scale(1); } 40% { transform: scale(1.32); } 100% { transform: scale(1); } }
+@keyframes ring-out  { 0% { opacity: 0.7; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes shimmer   { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+
+/* =========================================================
+   Page transitions (Chrome / Edge / Safari 18+; others just navigate)
+   Pages cross-fade, the nav stays put, and a book's cover glides
+   from its card to the book page (view-transition-name is set inline).
+   ========================================================= */
+@view-transition { navigation: auto; }
+.nav { view-transition-name: site-nav; }
+::view-transition-group(*) { animation-duration: 380ms; animation-timing-function: var(--ease-out); }
+::view-transition-old(root) { animation: 160ms ease-out both fade reverse; }
+::view-transition-new(root) { animation: 260ms var(--ease-out) 60ms both fade; }
+
+/* =========================================================
+   Entrances: content rises in, lists stagger (site.js sets --i)
+   ========================================================= */
+.current,
+.book-info > *,
+.current__body > *,
+.search-hero .container > *,
+.auth .container > *,
+.reviews__title,
+.section__title,
+.book-grid > li,
+.carousel__track > li,
+.shelf-grid > li,
+.shelf-head,
+.filters,
+.review-list > li,
+.chips > li,
+.genres > li,
+.shelf-empty,
+.reviews__empty,
+.search-results__count {
+  animation: rise var(--dur-4) var(--ease-out) both;
+  animation-delay: min(calc(var(--i, 0) * 45ms), 540ms);
+}
+.genres > li { animation-name: fade; }
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+.nav { transition: box-shadow var(--dur-3) var(--ease-out); }
+.nav.is-scrolled { box-shadow: 0 1px 0 rgb(255 255 255 / 0.04), 0 8px 24px rgb(0 0 0 / 0.4); }
+
+.nav__logo img { transition: transform var(--dur-3) var(--ease-spring); }
+.nav__logo:hover img { transform: scale(1.06) rotate(-3deg); }
+.nav__logo:active img { transform: scale(0.96); transition-duration: var(--dur-1); }
+
+/* underline grows from the centre instead of blinking on */
+.nav__links a {
+  position: relative;
+  padding-bottom: calc(var(--space-1) + 2px);
+  border-bottom: 0;
+  transition: color var(--ease);
+}
+.nav__links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transition: transform var(--dur-3) var(--ease-out);
+}
+.nav__links a:hover { color: var(--text-strong); }
+.nav__links a:hover::after,
+.nav__links a[aria-current="page"]::after { transform: scaleX(1); }
+
+.nav__icon {
+  border-radius: 50%;
+  transition: background-color var(--ease), transform var(--dur-2) var(--ease-spring);
+}
+.nav__icon:hover { background: rgb(255 255 255 / 0.08); }
+.nav__icon:active { transform: scale(0.9); transition-duration: var(--dur-1); }
+
+.nav__avatar { transition: box-shadow var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring); }
+.nav__avatar:hover { box-shadow: 0 0 0 3px rgb(215 222 223 / 0.22); transform: scale(1.05); }
+.nav__avatar:active { transform: scale(0.94); transition-duration: var(--dur-1); }
+
+/* footer links: brighten with an underline that slides in from the left */
+.footer__links a,
+.footer__logo span { position: relative; transition: color var(--ease); }
+.footer__links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-3) var(--ease-out);
+}
+.footer__links a:hover { color: var(--text-strong); }
+.footer__links a:hover::after { transform: scaleX(1); }
+.footer__logo img { transition: transform var(--dur-3) var(--ease-spring); }
+.footer__logo:hover img { transform: scale(1.06) rotate(-3deg); }
+
+/* flash messages slide down, then (success only) fold away - see site.js */
+.messages li {
+  max-height: 80px;
+  overflow: hidden;
+  animation: drop-in var(--dur-3) var(--ease-out) both;
+  transition: opacity var(--dur-3) var(--ease-out), max-height var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
+  cursor: pointer;
+}
+.messages li.is-leaving { opacity: 0; max-height: 0; padding-block: 0; }
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.btn-gold,
+.btn-ghost {
+  transition:
+    filter var(--ease),
+    background-color var(--ease),
+    border-color var(--ease),
+    box-shadow var(--dur-3) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.btn-gold { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 1px 2px rgb(0 0 0 / 0.3); }
+.btn-gold:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 20px rgb(183 134 0 / 0.3);
+}
+.btn-ghost:hover { border-color: var(--ice); transform: translateY(-1px); }
+.btn-gold:active,
+.btn-ghost:active { transform: translateY(0) scale(0.97); transition-duration: var(--dur-1); }
+.btn-gold:focus-visible,
+.btn-ghost:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* =========================================================
+   Covers: soft shadow, shimmer while loading, fade in when ready
+   (the "js" class is set in <head>, so without JavaScript covers simply show)
+   ========================================================= */
+.cover:has(img) { box-shadow: var(--shadow-1); background: #2b3236; }
+.shelf .cover:has(img),
+.current__cover:has(img) { box-shadow: var(--shadow-2); }
+
+.js .cover:has(img:not(.is-loaded)) {
+  background: linear-gradient(100deg, #2b3236 30%, #3a4448 50%, #2b3236 70%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.js .cover img {
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity var(--dur-4) var(--ease-out), transform 700ms var(--ease-out);
+}
+.js .cover img.is-loaded { opacity: 1; transform: none; }
+
+/* =========================================================
+   Book cards (homepage, search): lift + cover zoom on hover
+   ========================================================= */
+.book-card {
+  transition:
+    transform var(--dur-3) var(--ease-out),
+    box-shadow var(--dur-3) var(--ease-out),
+    background-color var(--ease);
+}
+.book-card:hover { filter: none; transform: translateY(-4px); box-shadow: var(--shadow-2); background: #e3e9ea; }
+.book-card:active { transform: translateY(-1px) scale(0.99); transition-duration: var(--dur-1); }
+.book-card:focus-visible { outline: none; box-shadow: var(--ring), var(--shadow-2); }
+.js .book-card .cover img.is-loaded { transition: opacity var(--dur-4) var(--ease-out), transform 600ms var(--ease-out); }
+.book-card:hover .cover img.is-loaded { transform: scale(1.045); }
+.book-card__rating svg { transition: transform var(--dur-3) var(--ease-spring); }
+.book-card:hover .book-card__rating svg { transform: rotate(72deg) scale(1.15); }
+
+.current { transition: box-shadow var(--dur-3) var(--ease-out); }
+.current:hover { box-shadow: var(--shadow-2); }
+
+.chips a {
+  transition: background-color var(--ease), border-color var(--ease), transform var(--dur-2) var(--ease-out);
+}
+.chips a:hover { border-color: var(--ice); transform: translateY(-1px); }
+
+/* shelf pages: cards lift, cover zooms, filters get the gold focus ring */
+.tbr-card { transition: transform var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out), background-color var(--ease); }
+.tbr-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); background: #1d1d1d; }
+.tbr-card:has(.tbr-card__link:active) { transform: translateY(-1px) scale(0.99); transition-duration: var(--dur-1); }
+.tbr-card:has(.tbr-card__link:focus-visible) { box-shadow: var(--ring), var(--shadow-2); }
+.tbr-card__link:focus-visible { outline: none; }
+.tbr-card:hover .cover img.is-loaded { transform: scale(1.045); }
+.filters__select { transition: box-shadow var(--dur-2) var(--ease-out), background-color var(--ease); }
+.filters__select:hover { background-color: #e2e8e9; }
+.filters__select:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* series carousel: arrows behave like the calendar ones (cards use the shelf-card hover) */
+.carousel__btn { transition: background-color var(--ease), border-color var(--ease), opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring); }
+.carousel__btn:not(:disabled):hover { background: rgb(215 222 223 / 0.08); border-color: var(--text); }
+.carousel__btn:not(:disabled):active { transform: scale(0.92); transition-duration: var(--dur-1); }
+.carousel__btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* calendar: bars draw in from their start day, buttons respond like the rest */
+@keyframes bar-in { from { clip-path: inset(0 100% 0 0 round 4px); } }
+.cal__bar {
+  animation: bar-in 600ms var(--ease-out) both;
+  animation-delay: calc(120ms + min(var(--i, 0) * 50ms, 400ms));
+  transition: filter var(--ease), transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
+}
+.cal__bar:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 10px rgb(0 0 0 / 0.35); z-index: 1; }
+.cal__bar:focus-visible { outline: none; box-shadow: var(--ring); z-index: 1; }
+.cal__arrow,
+.btn-outline { transition: background-color var(--ease), border-color var(--ease), transform var(--dur-2) var(--ease-spring); }
+.cal__arrow:active,
+.btn-outline:active { transform: scale(0.94); transition-duration: var(--dur-1); }
+.btn-outline:hover { border-color: var(--cal-text); }
+.btn-outline:focus-visible,
+.cal__arrow:focus-visible { outline: none; box-shadow: var(--ring); }
+.cal__today { animation: pop 520ms var(--ease-spring) 250ms both; }
+.cal__toolbar,
+.cal { animation: rise var(--dur-4) var(--ease-out) both; }
+.cal { animation-delay: 60ms; }
+
+/* =========================================================
+   Book page controls
+   ========================================================= */
+.status {
+  transition:
+    background-color var(--dur-3) var(--ease-out),
+    color var(--dur-3) var(--ease-out),
+    filter var(--ease),
+    box-shadow var(--dur-2) var(--ease-out);
+}
+.status:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.dates { transition: box-shadow var(--dur-2) var(--ease-out), border-color var(--ease); }
+.dates:hover { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.12); }
+.dates:focus-within { box-shadow: var(--ring); }
+.dates__part:focus-within { outline: none; }
+.dates__text { transition: color var(--ease); }
+/* the finish half slides in when it appears */
+.dates__sep,
+.dates__part:last-child { animation: slide-in var(--dur-3) var(--ease-out) both; }
+
+/* rating stars: grow on hover, colour eases in, a staggered pop when you rate (script.js) */
+.rate__star { transition: transform var(--dur-2) var(--ease-spring), color var(--dur-2) var(--ease-out); }
+.rate__star svg,
+.like svg {
+  fill: rgb(0 0 0 / 0);   /* transparent rather than "none", so the fill can fade */
+  transition: fill var(--dur-2) var(--ease-out), stroke-opacity var(--dur-2) var(--ease-out);
+}
+.rate__star.is-on svg { fill: currentColor; }
+.rate__star:hover { transform: scale(1.15); }
+.rate__star:active { transform: scale(0.9); transition-duration: var(--dur-1); }
+.rate__star.is-pop svg { animation: pop 420ms var(--ease-spring); }
+
+/* heart: pop + a gold ring bursting out when liked */
+.like { position: relative; transition: color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring); }
+.like:hover { transform: scale(1.08); }
+.like:active { transform: scale(0.9); transition-duration: var(--dur-1); }
+.like[aria-pressed="true"] svg { fill: currentColor; stroke: currentColor; stroke-opacity: 0; }
+.like.is-pop svg { animation: pop 480ms var(--ease-spring); }
+.like::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.like.is-pop[aria-pressed="true"]::after { animation: ring-out 560ms var(--ease-out); }
+.rate__star:focus-visible,
+.like:focus-visible { outline: none; box-shadow: var(--ring); border-radius: 6px; }
+
+/* "Saved" note fades in and out instead of popping */
+.shelf__msg { opacity: 0; transform: translateY(-3px); transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out); }
+.shelf__msg.is-shown { opacity: 1; transform: none; }
+
+/* catalog and review stars fill from the left */
+.stars::after { animation: fill-in 900ms var(--ease-out) 150ms both; }
+
+/* =========================================================
+   Text fields: soft gold ring on focus
+   ========================================================= */
+.review-form textarea,
+.search-form input,
+.auth__form input {
+  transition: box-shadow var(--dur-2) var(--ease-out), background-color var(--ease);
+}
+.review-form textarea:hover,
+.search-form input:hover,
+.auth__form input:hover { background: #e2e8e9; }
+.review-form textarea:focus,
+.search-form input:focus,
+.auth__form input:focus { outline: none; background: #e6ebec; box-shadow: var(--ring); }
+
+/* =========================================================
+   Gold glow
+   Every gold element gets a soft halo: box-shadow on blocks,
+   drop-shadow on icons and stars, text-shadow on gold text.
+   Hover turns it up a little. Delete this section to switch it off.
+   ========================================================= */
+
+/* gold buttons: Save review, Mark as finished, Log in, Search, Apply */
+.btn-gold { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 1px 2px rgb(0 0 0 / 0.3), var(--glow-md); }
+.btn-gold:hover { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 20px rgb(var(--glow-rgb) / 0.3), var(--glow-lg); }
+.btn-gold:focus-visible { box-shadow: var(--ring), var(--glow-lg); }
+
+/* shelf dropdown while it says "Reading" */
+.status[data-status="reading"] { box-shadow: var(--glow-md); }
+.status[data-status="reading"]:hover { box-shadow: var(--glow-lg); }
+.status[data-status="reading"]:focus-visible { box-shadow: var(--ring), var(--glow-lg); }
+
+/* your rating stars and the heart */
+.rate__star svg,
+.like svg { transition: fill var(--dur-2) var(--ease-out), stroke-opacity var(--dur-2) var(--ease-out), filter var(--dur-3) var(--ease-out); }
+.rate__star.is-on svg { filter: var(--glow-icon); }
+.like[aria-pressed="true"] svg { filter: var(--glow-icon); }
+.like[aria-pressed="true"]:hover svg { filter: var(--glow-icon-lg); }
+
+/* gold star displays: reviews, finished-shelf cards */
+.review .stars,
+.tbr-card__stars { filter: drop-shadow(0 0 3px rgb(var(--glow-rgb) / 0.45)); }
+
+/* gold text: "Currently reading", card ratings */
+.eyebrow,
+.book-card__rating { text-shadow: var(--glow-text); }
+.book-card__rating svg { filter: var(--glow-icon); }
+
+/* calendar: today's circle and the "Reading" bars */
+.cal__today { box-shadow: var(--glow-md); }
+.cal__bar--reading { box-shadow: var(--glow-sm); }
+.cal__bar--reading:hover { box-shadow: 0 4px 10px rgb(0 0 0 / 0.35), var(--glow-md); }
+.cal__bar--reading:focus-visible { box-shadow: var(--ring), var(--glow-md); }
+
+/* "Review saved." banner */
+.messages li:not(.error) { box-shadow: 0 4px 24px rgb(var(--glow-rgb) / 0.35); position: relative; z-index: 1; }
+
+/* =========================================================
+   Reduced motion: keep the colour changes, drop the movement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .js .cover img { transform: none; }
+}
