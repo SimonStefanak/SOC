@@ -361,6 +361,9 @@ body { text-rendering: optimizeLegibility; }
 .rate__star.is-on svg { filter: var(--glow-icon); }
 .like[aria-pressed="true"] svg { filter: var(--glow-icon); }
 .like[aria-pressed="true"]:hover svg { filter: var(--glow-icon-lg); }
+/* the homepage heart is pale blue, so its glow is too */
+.current__review .like[aria-pressed="true"] svg { filter: drop-shadow(0 0 5px rgb(203 241 245 / 0.55)); }
+.current__review .like[aria-pressed="true"]:hover svg { filter: drop-shadow(0 0 8px rgb(203 241 245 / 0.7)); }
 
 /* gold star displays: reviews, finished-shelf cards */
 .review .stars,

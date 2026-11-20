@@ -17,6 +17,7 @@
   --ice:    #f2f5f9;   /* genre chips, "Book page" button */
   --haze:   #e1e8f0;   /* author line on the currently-reading card */
   --steel:  #c8d3e0;   /* "Reading since", chip and button outlines, dashed cover */
+  --heart:  #cbf1f5;   /* outline of the like button on the homepage card */
   --gold:   #b78600;   /* "Reading" select, your rating, heart, save button, review stars */
   --gold-ink: #171717; /* text on gold */
   --hint:   #3b4a63;   /* placeholders */
@@ -377,7 +378,7 @@ main { flex: 1; display: flex; flex-direction: column; }
   stroke-linejoin: round;
 }
 .rate__star svg { width: 28px; height: 28px; stroke-width: 2; }
-.like svg { width: 37px; height: 34px; stroke-width: 1.1; overflow: visible; }
+.like svg { width: 37px; height: 34px; stroke-width: 1.8; overflow: visible; }
 .rate__star.is-on { color: var(--gold); }
 .rate__star.is-on svg { fill: currentColor; }
 .like[aria-pressed="true"] { color: var(--gold); }
@@ -517,6 +518,8 @@ main { flex: 1; display: flex; flex-direction: column; }
 .carousel__track > li { scroll-snap-align: start; }
 .carousel.can-left .carousel__track { --fade-l: 48px; }
 .carousel.can-right .carousel__track { --fade-r: 48px; }
+/* homepage "Finished this year": the light book cards, at their mockup width (175px) */
+.carousel__track--home { grid-auto-columns: 175px; gap: 20px; }
 
 /* =========================================================
    Homepage: "currently reading" band
@@ -525,14 +528,23 @@ main { flex: 1; display: flex; flex-direction: column; }
 
 .current {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 28px;
   padding: 28px;
   background: var(--coal);
   border-radius: 20px;
 }
 .current__cover { --cover-w: 140px; }
-.current__body { min-width: 0; }
+/* the text column is centred against the cover; the review column starts at the top */
+.current__body { flex: 0 1 312px; min-width: 0; align-self: center; }
+
+/* review box + rating, the same components as the book page */
+.current__review { flex: 0 1 401px; min-width: 0; padding-top: 3px; }
+.current__review textarea { height: 102px; }
+.current__review .shelf__field--rating { margin-top: 9px; gap: 7px; }
+.current__review .like { color: var(--heart); margin-bottom: 0; }
+/* Django addition: the "Saved" note under the stars */
+.current__review .shelf__msg { margin-top: 4px; }
 
 .eyebrow {
   margin: 0;
@@ -988,13 +1000,17 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .book-reviews { padding: var(--space-6) 0; }
   .reviews__grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
   .book-series { padding: 0 0 var(--space-6); }
-  .carousel__track { grid-auto-columns: 140px; gap: var(--space-3); }
+  .carousel__track,
+  .carousel__track--home { grid-auto-columns: 140px; gap: var(--space-3); }
 
   .home-hero { padding: var(--space-6) 0; }
   .current { flex-direction: column; align-items: stretch; gap: var(--space-5); padding: var(--space-5); }
   .current__cover { --cover-w: 140px; }
   .current__title { font-size: 28px; line-height: 1.15; }
   .current__actions { flex-wrap: wrap; }
+  /* in a column, flex-basis would set the height, so reset both panels */
+  .current__body,
+  .current__review { flex: 0 1 auto; align-self: stretch; }
 
   .home-shelves { padding: var(--space-6) 0 var(--space-5); }
   .section__title { font-size: var(--fs-byline); line-height: 1.2; }

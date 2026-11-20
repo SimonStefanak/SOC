@@ -56,6 +56,37 @@ def finish_book(request, book_id):
     return redirect("home")
 
 
+@login_required
+@require_POST
+def quick_update(request, book_id):
+    """Background save from the homepage card: changes only the fields that are
+    sent (rating, favorite, review_text) and leaves shelf and dates alone."""
+    entry = get_object_or_404(UserBook, user=request.user, book_id=book_id)
+    fields = []
+
+    if "rating" in request.POST:
+        value = request.POST["rating"].strip()
+        if value == "":
+            entry.rating = None
+        elif value.isdigit() and 1 <= int(value) <= 5:
+            entry.rating = int(value)
+        else:
+            return JsonResponse({"ok": False, "errors": ["The rating must be 1 to 5 stars."]}, status=400)
+        fields.append("rating")
+
+    if "favorite" in request.POST:
+        entry.favorite = request.POST["favorite"] == "true"
+        fields.append("favorite")
+
+    if "review_text" in request.POST:
+        entry.review_text = request.POST["review_text"].strip()
+        fields.append("review_text")
+
+    if fields:
+        entry.save(update_fields=fields + ["updated_at"])
+    return JsonResponse({"ok": True})
+
+
 def search(request):
     """Search all books by title, author or ISBN. Every word must match
     (in the title or the author), most-rated books first."""

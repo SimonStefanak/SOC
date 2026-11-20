@@ -1,4 +1,5 @@
 {% extends "books/base.html" %}
+{% load static book_extras %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
@@ -25,6 +26,31 @@
           <a class="btn-ghost" href="{% url 'book' current.book.pk %}">Book page</a>
         </div>
       </div>
+
+      <!-- Same review box and rating row as the book page, so you can log a book
+           without leaving the homepage. Each change saves in the background
+           (home.js -> quick_update), so the form itself is never submitted. -->
+      <form class="review-form current__review" action="{% url 'quick_update' current.book.pk %}" method="post"
+            data-quick-url="{% url 'quick_update' current.book.pk %}" data-rating="{{ current.rating|default_if_none:'' }}">
+        {% csrf_token %}
+        <label for="home-review">Your review</label>
+        <textarea id="home-review" name="review_text" placeholder="What did you think?">{{ current.review_text|default_if_none:'' }}</textarea>
+
+        <div class="shelf__field shelf__field--rating">
+          <span class="shelf__label" id="home-rating-label">Your rating</span>
+          <div class="shelf__rate">
+            <div class="rate" role="group" aria-labelledby="home-rating-label">
+              {% for i, on in current.rating|star_range %}
+              <button type="button" class="rate__star{% if on %} is-on{% endif %}" data-value="{{ i }}" aria-label="{{ i }} star{{ i|pluralize }}" aria-pressed="{% if i == current.rating %}true{% else %}false{% endif %}"><svg aria-hidden="true"><use href="#i-star"/></svg></button>
+              {% endfor %}
+            </div>
+            <button type="button" class="like" aria-label="Like this book" aria-pressed="{% if current.favorite %}true{% else %}false{% endif %}">
+              <svg aria-hidden="true"><use href="#i-heart"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="shelf__msg" role="status" aria-live="polite"></p>
+      </form>
     </article>
 
     {% elif user.is_authenticated %}
@@ -57,10 +83,20 @@
 {% if user.is_authenticated %}
 <section class="home-shelves">
   <div class="container">
-    <h2 class="section__title">Finished this year</h2>
-
     {% if read_this_year %}
-    <ul class="book-grid">
+    <div class="carousel" data-carousel>
+      <div class="carousel__head">
+        <h2 class="section__title">Finished this year</h2>
+        <div class="carousel__nav">
+          <button type="button" class="carousel__btn" data-carousel-prev aria-label="Previous books">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button type="button" class="carousel__btn" data-carousel-next aria-label="More books">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <ul class="carousel__track carousel__track--home">
       {% for entry in read_this_year %}
       <li>
         <a class="book-card" href="{% url 'book' entry.book.pk %}">
@@ -76,7 +112,9 @@
       </li>
       {% endfor %}
     </ul>
+    </div>
     {% else %}
+    <h2 class="section__title">Finished this year</h2>
     <p class="shelf-empty">No books finished this year yet.</p>
     {% endif %}
 
@@ -94,4 +132,8 @@
   </div>
 </section>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'books/home.js' %}" defer></script>
 {% endblock %}
