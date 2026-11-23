@@ -76,7 +76,7 @@ def quick_update(request, book_id):
 
     if "favorite" in request.POST:
         entry.favorite = request.POST["favorite"] == "true"
-        fields.append("favorite")
+        fields += ["favorite", "liked_at"]   # UserBook.save() keeps liked_at in step
 
     if "review_text" in request.POST:
         entry.review_text = request.POST["review_text"].strip()
@@ -108,7 +108,7 @@ def search(request):
 # The two shelf pages share one template; this is what differs between them.
 SHELVES = {
     "to_read": {
-        "status": UserBook.Status.TO_READ,
+        "filter": {"status": UserBook.Status.TO_READ},
         "title": "To read",
         "date_field": "added_at",        # a DateTimeField
         "date_label": "Date added",
@@ -122,7 +122,7 @@ SHELVES = {
         "empty": "Nothing on your to-read shelf yet. Find a book and set it to “To read”.",
     },
     "finished": {
-        "status": UserBook.Status.READ,
+        "filter": {"status": UserBook.Status.READ},
         "title": "Finished",
         "date_field": "date_finished",   # a DateField, may be empty
         "date_label": "Date finished",
@@ -136,13 +136,28 @@ SHELVES = {
         ],
         "empty": "No finished books yet. Mark a book as finished and it will land here.",
     },
+    "liked": {
+        "filter": {"favorite": True},      # any shelf: every book with the heart on
+        "title": "Liked",
+        "date_field": "liked_at",        # a DateTimeField
+        "date_label": "Date liked",
+        "card_label": "Liked",
+        "sorts": [
+            ("-liked", "Date liked, newest", [F("liked_at").desc(nulls_last=True), "-updated_at"]),
+            ("liked", "Date liked, oldest", [F("liked_at").asc(nulls_last=True), "updated_at"]),
+            ("-rating", "Your rating, highest", [F("rating").desc(nulls_last=True), "book__title"]),
+            ("title", "Title, A–Z", ["book__title"]),
+            ("author", "Author, A–Z", ["book__author", "book__title"]),
+        ],
+        "empty": "No liked books yet. Tap the heart on a book and it will show up here.",
+    },
 }
 DATE_RANGES = [("7", "Last 7 days"), ("30", "Last 30 days"), ("365", "Last year")]
 
 
 def _shelf_page(request, key):
     shelf = SHELVES[key]
-    on_shelf = UserBook.objects.filter(user=request.user, status=shelf["status"])
+    on_shelf = UserBook.objects.filter(user=request.user, **shelf["filter"])
     entries = on_shelf.select_related("book")
 
     # Date filter: only the values offered in the dropdown are accepted
@@ -150,8 +165,8 @@ def _shelf_page(request, key):
     if days in dict(DATE_RANGES):
         field = shelf["date_field"]
         since = timedelta(days=int(days))
-        if field == "added_at":
-            entries = entries.filter(added_at__gte=timezone.now() - since)
+        if field in ("added_at", "liked_at"):     # date-and-time fields
+            entries = entries.filter(**{f"{field}__gte": timezone.now() - since})
         else:
             entries = entries.filter(**{f"{field}__gte": timezone.localdate() - since})
     else:
@@ -191,6 +206,11 @@ def to_be_read(request):
 @login_required
 def finished(request):
     return _shelf_page(request, "finished")
+
+
+@login_required
+def liked(request):
+    return _shelf_page(request, "liked")
 
 
 def _save_entry(form):

@@ -103,7 +103,7 @@
           <div class="cover cover--ink book-card__cover" style="view-transition-name: cover-{{ entry.book.pk }}">
             {% if entry.book.image_url %}<img src="{{ entry.book.image_url }}" alt="">{% else %}Cover{% endif %}
           </div>
-          <h3 class="book-card__title">{{ entry.book.title }}</h3>
+          <h3 class="book-card__title" title="{{ entry.book.title }}">{{ entry.book.title|short_title }}</h3>
           <p class="book-card__author">{{ entry.book.author }}</p>
           {% if entry.book.goodreads_avg_rating %}
           <p class="book-card__rating"><svg aria-hidden="true"><use href="#i-star"/></svg>{{ entry.book.goodreads_avg_rating|floatformat:1 }}</p>
@@ -135,5 +135,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'books/home.js' %}" defer></script>
+<script src="{% static_v 'books/home.js' %}" defer></script>
 {% endblock %}

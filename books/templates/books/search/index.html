@@ -1,4 +1,5 @@
 {% extends "books/base.html" %}
+{% load book_extras %}
 {% block title %}{% if query %}{{ query }} – Search{% else %}Search{% endif %}{% endblock %}
 
 {% block content %}
@@ -27,7 +28,7 @@
           <div class="cover cover--ink book-card__cover" style="view-transition-name: cover-{{ book.pk }}">
             {% if book.image_url %}<img src="{{ book.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
           </div>
-          <h3 class="book-card__title">{{ book.title }}</h3>
+          <h3 class="book-card__title" title="{{ book.title }}">{{ book.title|short_title }}</h3>
           <p class="book-card__author">{{ book.author }}</p>
           {% if book.goodreads_avg_rating %}
           <p class="book-card__rating"><svg aria-hidden="true"><use href="#i-star"/></svg>{{ book.goodreads_avg_rating|floatformat:1 }}</p>

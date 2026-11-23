@@ -1,4 +1,5 @@
 {% extends "books/base.html" %}
+{% load book_extras %}
 {% block title %}{{ shelf.title }}{% endblock %}
 
 {% block content %}
@@ -57,10 +58,13 @@
             <div class="cover tbr-card__cover" style="view-transition-name: cover-{{ entry.book.pk }}">
               {% if entry.book.image_url %}<img src="{{ entry.book.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
             </div>
-            <h2 class="tbr-card__title" title="{{ entry.book.title }}">{{ entry.book.title }}</h2>
+            <h2 class="tbr-card__title" title="{{ entry.book.title }}">{{ entry.book.title|short_title }}</h2>
             <p class="tbr-card__author">{{ entry.book.author }}</p>
             {% if shelf_key == "finished" %}
               <p class="tbr-card__added">{{ shelf.card_label }}{% if entry.date_finished %} {{ entry.date_finished|date:"j M Y" }}{% endif %}</p>
+              {% if entry.rating %}<span class="stars tbr-card__stars" style="--rating: {{ entry.rating }}" role="img" aria-label="Your rating: {{ entry.rating }} out of 5"></span>{% endif %}
+            {% elif shelf_key == "liked" %}
+              <p class="tbr-card__added">{{ entry.get_status_display }}{% if entry.liked_at %} · {{ shelf.card_label }} {{ entry.liked_at|date:"j M Y" }}{% endif %}</p>
               {% if entry.rating %}<span class="stars tbr-card__stars" style="--rating: {{ entry.rating }}" role="img" aria-label="Your rating: {{ entry.rating }} out of 5"></span>{% endif %}
             {% else %}
               <p class="tbr-card__added">{{ shelf.card_label }} {{ entry.added_at|date:"j M Y" }}</p>

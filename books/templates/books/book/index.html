@@ -110,7 +110,7 @@
             <div class="cover tbr-card__cover" style="view-transition-name: cover-{{ other.pk }}">
               {% if other.image_url %}<img src="{{ other.image_url }}" alt="" loading="lazy">{% else %}Cover{% endif %}
             </div>
-            <h3 class="tbr-card__title" title="{{ other.title }}">{{ other.title }}</h3>
+            <h3 class="tbr-card__title" title="{{ other.title }}">{{ other.title|short_title }}</h3>
             <p class="tbr-card__author">{{ other.author }}</p>
             <p class="tbr-card__added">{% if other.series_position %}Book {{ other.series_position }}{% endif %}{% if other.series_position and other.goodreads_avg_rating %} · {% endif %}{% if other.goodreads_avg_rating %}★ {{ other.goodreads_avg_rating|floatformat:1 }}{% endif %}</p>
           </a>
@@ -169,5 +169,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'books/script.js' %}" defer></script>
+<script src="{% static_v 'books/script.js' %}" defer></script>
 {% endblock %}

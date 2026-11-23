@@ -211,6 +211,7 @@ body { text-rendering: optimizeLegibility; }
     background-color var(--ease);
 }
 .book-card:hover { filter: none; transform: translateY(-4px); box-shadow: var(--shadow-2); background: #e3e9ea; }
+.home-shelves .book-card:hover { background: #283034; }   /* dark homepage cards lighten a touch instead */
 .book-card:active { transform: translateY(-1px) scale(0.99); transition-duration: var(--dur-1); }
 .book-card:focus-visible { outline: none; box-shadow: var(--ring), var(--shadow-2); }
 .js .book-card .cover img.is-loaded { transition: opacity var(--dur-4) var(--ease-out), transform 600ms var(--ease-out); }

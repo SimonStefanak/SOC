@@ -95,6 +95,7 @@ class UserBook(models.Model):
     date_finished = models.DateField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     added_at = models.DateTimeField(default=timezone.now, editable=False)  # when it first went on a shelf
+    liked_at = models.DateTimeField(null=True, blank=True, editable=False)  # when the heart was last turned on
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["user", "book"], name="unique_user_book")]
@@ -102,3 +103,11 @@ class UserBook(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.book} ({self.get_status_display()})"
+
+    def save(self, *args, **kwargs):
+        # liked_at follows the heart: set when it's turned on, cleared when it's turned off
+        if self.favorite and not self.liked_at:
+            self.liked_at = timezone.now()
+        elif not self.favorite:
+            self.liked_at = None
+        super().save(*args, **kwargs)
