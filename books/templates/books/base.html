@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}Books{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -107,6 +107,16 @@
       </div>
     </div>
   </footer>
+
+  <!-- Phone navigation. Hidden above the phone breakpoint; see .tabbar in style.css. -->
+  {% url 'home' as home_url %}{% url 'search' as search_url %}{% url 'to_be_read' as tab_to_read %}{% url 'calendar' as tab_calendar %}{% url 'finished' as tab_finished %}
+  <nav class="tabbar" aria-label="Sections">
+    <a href="{{ home_url }}"{% if request.path == home_url %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.6 12 3.5l8.5 7.1V20a1 1 0 0 1-1 1h-4.6v-5.8H9.1V21H4.5a1 1 0 0 1-1-1z"/></svg></span>Home</a>
+    <a href="{{ search_url }}"{% if request.path == search_url %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></span>Search</a>
+    <a href="{{ tab_to_read }}"{% if request.path == tab_to_read %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3h11v18l-5.5-4.2L6.5 21z"/></svg></span>To read</a>
+    <a href="{{ tab_calendar }}"{% if request.path == tab_calendar %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/></svg></span>Calendar</a>
+    <a href="{{ tab_finished }}"{% if request.path == tab_finished %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="m8.3 12.2 2.6 2.6 4.8-5.2"/></svg></span>Finished</a>
+  </nav>
 
   {% block scripts %}{% endblock %}
 </body>

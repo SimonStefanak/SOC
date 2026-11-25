@@ -24,7 +24,9 @@
   --neutral: #343b3e;  /* shelf select for any status but "Reading" (not in the mockup) */
   /* the calendar mockup uses its own grey ramp */
   --cal-text:  #e3e6e8;   /* day numbers, button labels */
-  --cal-dim:   #9aa0a6;   /* weekday headings */
+  --cal-dim:   #9aa0a6;   /* weekday headings, phone footer text */
+  --rule:      #2e3236;   /* tab bar and footer dividers */
+  --avatar-bg: #474849;   /* nav avatar on phone */
   --cal-faint: #5f656b;   /* out-of-month days, button outlines */
   --cal-line:  #343b3e;   /* grid lines */
   /* one colour per book; gold means "currently reading" */
@@ -900,7 +902,7 @@ a.btn-outline { display: inline-flex; align-items: center; }
    Homepage: Django additions (empty states, inline form)
    ========================================================= */
 .current__form { display: contents; }
-.current__text { margin: var(--space-2) 0 0; font-size: var(--fs-body); color: var(--steel); }
+.current__note { margin: var(--space-2) 0 0; font-size: var(--fs-body); color: var(--steel); }
 .shelf-empty { margin: 0; color: var(--text-muted); }
 /* chips without a page to link to yet */
 .chips span {
@@ -1041,53 +1043,172 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
 .pager__info { color: var(--text-muted); }
 
 /* =========================================================
-   Small screens
+   Phone tab bar + phone-only affordances
+   Hidden above the phone breakpoint; the rules that show them are below.
+   ========================================================= */
+.tabbar { display: none; }
+
+.section__more { display: none; }
+.book__more {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* =========================================================
+   Phone (<=760px)
+   Measured from the Figma frames "Book page - phone", "Home - phone"
+   and "To read - phone" (390 wide, 16px gutter).
    ========================================================= */
 @media (max-width: 760px) {
   :root { --gutter: var(--space-4); --nav-h: 56px; }
-  .nav { grid-template-columns: auto 1fr auto; padding: 0 var(--gutter); }
-  .nav__logo img { height: 28px; }
-  .nav__links { gap: var(--space-4); justify-content: center; font-size: var(--fs-sm); }
-  .nav__actions { gap: var(--space-2); }
 
-  .book-hero { padding: var(--space-5) 0 var(--space-6); }
-  .book-hero__inner { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
-  .shelf { max-width: var(--shelf-w); }
-  .book__title { font-size: 36px; }
-  .book__desc { max-width: none; font-size: var(--fs-lg); line-height: 1.45; }
+  /* ---- top bar keeps only the logo and the avatar; the links live in the tab bar ---- */
+  body { padding-bottom: calc(69px + env(safe-area-inset-bottom, 0px)); }
+  .nav { grid-template-columns: auto 1fr auto; padding: 0 22px 0 var(--gutter); }
+  .nav__links,
+  .nav__icon { display: none; }
+  .nav__logo img { height: 34px; }
+  .nav__avatar { width: 32px; height: 32px; background: var(--avatar-bg); color: var(--mist); }
+  .nav__avatar svg { width: 18px; height: 18px; }
 
-  .book-reviews { padding: var(--space-6) 0; }
-  .reviews__grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
-  .book-series { padding: 0 0 var(--space-6); }
-  .carousel__track,
-  .carousel__track--home { grid-auto-columns: 140px; gap: var(--space-3); }
+  /* ---- bottom tab bar (sits above the iPhone home indicator) ---- */
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    height: calc(69px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--rule);
+    background: var(--coal);
+  }
+  .tabbar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding-top: 9px;
+    color: var(--fog);
+    font-size: var(--fs-xs);
+    line-height: 1;
+  }
+  .tabbar__icon { display: grid; place-items: center; width: 56px; height: 30px; border-radius: var(--radius-pill); }
+  .tabbar svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .tabbar a[aria-current="page"] { color: var(--text-strong); }
+  .tabbar a[aria-current="page"] .tabbar__icon { background: var(--neutral); }
 
-  .home-hero { padding: var(--space-6) 0; }
-  .current { flex-direction: column; align-items: stretch; gap: var(--space-5); padding: var(--space-5); }
-  .current__cover { --cover-w: 140px; }
-  .current__title { font-size: 28px; line-height: 1.15; }
-  .current__actions { flex-wrap: wrap; }
-  /* in a column, flex-basis would set the height, so reset both panels */
-  .current__body,
-  .current__review { flex: 0 1 auto; align-self: stretch; }
+  /* ---- footer collapses to three centred lines ---- */
+  .footer { padding: 22px 0 20px; color: var(--cal-dim); text-align: center; font-size: var(--fs-sm); line-height: 21px; }
+  .footer__top { display: block; padding: 0; }
+  .footer__cols { display: none; }
+  .footer__brand { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 5px; }
+  .footer__logo { display: inline; color: inherit; font-size: var(--fs-sm); font-weight: 400; line-height: 21px; }
+  .footer__logo img { display: none; }
+  .footer__logo span::after { content: " \00b7"; }
+  .footer__tagline { margin: 0; font-size: var(--fs-sm); line-height: 21px; color: inherit; }
+  .footer__bottom { display: block; padding: 0; border: 0; font-size: var(--fs-sm); line-height: 21px; color: inherit; }
 
-  .home-shelves { padding: var(--space-6) 0 var(--space-5); }
-  .section__title { font-size: var(--fs-byline); line-height: 1.2; }
-  .section__title--genres { margin-top: var(--space-6); }
-  .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
-  .search-hero { padding: var(--space-6) 0 var(--space-5); }
-  .auth { min-height: 0; padding: var(--space-6) 0 48px; }
-  .auth__title { font-size: var(--fs-hero); }
-  .chips a, .chips span { height: 38px; padding: 0 16px; font-size: var(--fs-sm); }
+  /* ---- book page ---- */
+  .book-hero { padding: 24px 0 20px; }
+  /* display:contents lets the cover, the shelf controls and the book text be
+     re-ordered into one grid even though they sit in two wrappers */
+  .book-hero__inner { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: 16px; row-gap: 0; }
+  .shelf,
+  .book-info { display: contents; }
+  .shelf .cover { grid-area: 1 / 1 / 3 / 2; --cover-w: 112px; }
+  .book__head { grid-area: 1 / 2 / 2 / 3; }
+  .genres { grid-area: 2 / 2 / 3 / 3; align-self: start; margin: 6px 0 0; }
+  .status,
+  .shelf__login { grid-area: 3 / 1 / 4 / 3; margin-top: 20px; }
+  .shelf__field:not(.shelf__field--rating) { grid-area: 4 / 1 / 5 / 3; margin-top: 14px; }
+  .shelf__field--rating { grid-area: 5 / 1 / 6 / 3; margin-top: 13px; }
+  .shelf__msg { grid-area: 6 / 1 / 7 / 3; }
+  .shelf__login { margin-bottom: 18px; }   /* same gap as the "Saved" line leaves when logged in */
+  .rating { grid-area: 7 / 1 / 8 / 3; margin-top: 12px; }
+  .book__desc { grid-area: 8 / 1 / 9 / 3; }
+  .book__more { grid-area: 9 / 1 / 10 / 3; }
 
-  .shelf-page { padding: var(--space-5) 0 var(--space-6); }
-  .shelf-title { font-size: var(--fs-section); line-height: 1.2; }
-  .filters { width: 100%; gap: var(--space-2); }
+  .book__title { font-size: 32px; line-height: 1.05; }
+  .book__head { display: block; }
+  .book-info .book__author { position: static; margin-top: 3px; font-size: var(--fs-ctl); }
+  .book-info .book__year { position: static; margin: 0; font-size: var(--fs-md); }
+  .genres { gap: 6px; }
+  .genres li { height: 32px; padding: 0 12px; }
+  /* the stars sit left and the heart is pushed to the far edge */
+  .shelf__rate { justify-content: space-between; }
+  .like svg { width: 30px; height: 27px; }
+  .rating .stars { --size: 18px; }
+  .rating { gap: 10px; }
+
+  .book__desc { max-width: none; margin-top: 26px; font-size: var(--fs-ctl); line-height: 1.5; }
+  .book__desc.is-clamped { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .book__more { display: block; justify-self: start; margin-top: 14px; }
+
+  .book-series { padding: 8px 0 28px; }
+  .book-reviews { padding: 24px 0 28px; }
+  .reviews__grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-5); }
+  .review-form textarea { height: 120px; }
+  .reviews__title { margin-bottom: 18px; }
+
+  /* ---- homepage: cover beside the text, buttons on their own row across the card ---- */
+  .home-hero { padding: 24px 0 32px; }
+  .current {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0 16px;
+    padding: 16px;
+    border-radius: var(--radius-xl);
+  }
+  .current__body { display: contents; }
+  .current__cover { grid-area: 1 / 1 / 2 / 2; --cover-w: 88px; }
+  .current__text { grid-area: 1 / 2 / 2 / 3; align-self: center; }
+  .current__actions { grid-column: 1 / -1; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+  .current__actions > a,
+  .current__form > button { flex: 1 1 auto; justify-content: center; text-align: center; white-space: nowrap; }
+  /* empty / logged-out card has no cover: the text takes the whole width */
+  .current:not(:has(.current__cover)) { grid-template-columns: minmax(0, 1fr); }
+  .current:not(:has(.current__cover)) .current__text { grid-area: auto; }
+  .current__review { display: none; }   /* not in the phone design */
+  .current__title { font-size: var(--fs-section); line-height: 1.15; }
+  .current__author { font-size: var(--fs-md); }
+  .current__since { font-size: var(--fs-sm); }
+
+  .home-shelves { padding: 21px 0 32px; }
+  .section__title { font-size: var(--fs-section); line-height: 1.2; }
+  .section__more { display: inline; margin-left: auto; font-size: var(--fs-md); font-weight: 600; color: var(--text); text-decoration: underline; }
+  .section__title--genres { margin-top: 32px; }
+  /* carousels: swipe instead of arrows; homepage cards at the phone width */
+  .js .carousel__nav { display: none; }
+  .carousel__track { grid-auto-columns: 140px; gap: 12px; }
+  .carousel__track--home { grid-auto-columns: 132px; }
+  .chips { gap: 8px; }
+  .chips a,
+  .chips span { height: 32px; padding: 0 13px; font-size: var(--fs-sm); }
+
+  /* ---- shelf pages (To read, Finished, Liked) ---- */
+  .shelf-page { padding: 24px 0 26px; }
+  .shelf-title { font-size: 34px; line-height: 1.15; }
+  .filters { width: 100%; gap: var(--space-2); margin-top: 20px; }
   .filters__group,
   .filters__group--wide { width: auto; flex: 1 1 150px; }
-  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
+  .shelf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
 
-  /* the month grid can't usefully shrink to phone width, so it scrolls sideways */
+  /* ---- search ---- */
+  .search-hero { padding: var(--space-6) 0 var(--space-5); }
+  .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+  /* ---- calendar: the month grid can't shrink, so it scrolls sideways ---- */
   .cal-page { padding: var(--space-5) 0 var(--space-6); }
   .cal__toolbar { flex-wrap: wrap; height: auto; row-gap: var(--space-3); }
   .cal__title { order: -1; flex: 1 0 100%; margin: 0; font-size: var(--fs-byline); line-height: 1.2; }
@@ -1098,12 +1219,7 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .cal--week .cal__weekdays,
   .cal--week .cal__weeks { min-width: 620px; }
 
-  .footer__top { flex-direction: column; padding: var(--space-6) 0 var(--space-5); }
-  .footer__cols { gap: 48px; }
-  .footer__bottom { flex-direction: column; padding: var(--space-5) 0; }
-}
-
-@media (max-width: 480px) {
-  .book-grid,
-  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  /* ---- log in / create account ---- */
+  .auth { min-height: 0; padding: var(--space-6) 0 48px; }
+  .auth__title { font-size: var(--fs-hero); }
 }

@@ -13,10 +13,12 @@
       </div>
 
       <div class="current__body">
-        <p class="eyebrow">Currently reading</p>
-        <h1 class="book__title current__title">{{ current.book.title }}</h1>
-        <p class="current__author">{{ current.book.author }}</p>
-        {% if current.date_started %}<p class="current__since">Reading since {{ current.date_started|date:"j F Y" }}</p>{% endif %}
+        <div class="current__text">
+          <p class="eyebrow">Currently reading</p>
+          <h1 class="book__title current__title">{{ current.book.title }}</h1>
+          <p class="current__author">{{ current.book.author }}</p>
+          {% if current.date_started %}<p class="current__since">Reading since {{ current.date_started|date:"j F Y" }}</p>{% endif %}
+        </div>
 
         <div class="current__actions">
           <form class="current__form" method="post" action="{% url 'finish_book' current.book.pk %}">
@@ -56,9 +58,11 @@
     {% elif user.is_authenticated %}
     <article class="current">
       <div class="current__body">
-        <p class="eyebrow">Currently reading</p>
-        <h1 class="book__title current__title">Nothing on the go</h1>
-        <p class="current__text">Set a book to “Reading” on its page and it will show up here.</p>
+        <div class="current__text">
+          <p class="eyebrow">Currently reading</p>
+          <h1 class="book__title current__title">Nothing on the go</h1>
+          <p class="current__note">Set a book to “Reading” on its page and it will show up here.</p>
+        </div>
         <div class="current__actions">
           <a class="btn-ghost" href="{% url 'to_be_read' %}">Your to-read list</a>
         </div>
@@ -68,9 +72,11 @@
     {% else %}
     <article class="current">
       <div class="current__body">
-        <p class="eyebrow">Welcome</p>
-        <h1 class="book__title current__title">Track what you read</h1>
-        <p class="current__text">Log in to see what you're reading, what you've finished this year and your favourite genres.</p>
+        <div class="current__text">
+          <p class="eyebrow">Welcome</p>
+          <h1 class="book__title current__title">Track what you read</h1>
+          <p class="current__note">Log in to see what you're reading, what you've finished this year and your favourite genres.</p>
+        </div>
         <div class="current__actions">
           <a class="btn-gold" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in</a>
         </div>
@@ -87,6 +93,7 @@
     <div class="carousel" data-carousel>
       <div class="carousel__head">
         <h2 class="section__title">Finished this year</h2>
+        <a class="section__more" href="{% url 'finished' %}">See all</a>
         <div class="carousel__nav">
           <button type="button" class="carousel__btn" data-carousel-prev aria-label="Previous books">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>

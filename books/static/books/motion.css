@@ -340,6 +340,18 @@ body { text-rendering: optimizeLegibility; }
 .auth__form input:focus { outline: none; background: #e6ebec; box-shadow: var(--ring); }
 
 /* =========================================================
+   Phone tab bar: stays still while pages cross-fade; tabs press in when tapped
+   ========================================================= */
+.tabbar { view-transition-name: site-tabbar; }
+.tabbar a { -webkit-tap-highlight-color: transparent; transition: color var(--ease); }
+.tabbar__icon { transition: background-color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring); }
+.tabbar a:active .tabbar__icon { transform: scale(0.9); transition-duration: var(--dur-1); }
+.tabbar a:focus-visible { outline: none; }
+.tabbar a:focus-visible .tabbar__icon { box-shadow: var(--ring); }
+.book__more { transition: color var(--ease); }
+.book__more:hover { color: var(--text-strong); }
+
+/* =========================================================
    Gold glow
    Every gold element gets a soft halo: box-shadow on blocks,
    drop-shadow on icons and stars, text-shadow on gold text.

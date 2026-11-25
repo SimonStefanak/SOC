@@ -71,9 +71,13 @@
       </ul>
       {% endif %}
 
-      <p class="book__desc">
+      <p class="book__desc{% if book.description %} is-clamped{% endif %}" id="book-desc">
         {% if book.description %}{{ book.description|linebreaksbr }}{% else %}<em>No description yet.</em>{% endif %}
       </p>
+      {% if book.description %}
+      <!-- Phone only: the description is clamped to one line until this is tapped (site.js). -->
+      <button type="button" class="book__more" aria-expanded="false" aria-controls="book-desc">More</button>
+      {% endif %}
 
       {% if book.goodreads_avg_rating %}
       <div class="rating">
@@ -136,7 +140,7 @@
 
         <label for="review">Your review</label>
         <textarea id="review" name="review_text" placeholder="What did you think?">{{ entry.review_text|default_if_none:'' }}</textarea>
-        <p class="review-form__hint">Your rating comes from the stars on the book card.</p>
+        <p class="review-form__hint">Your rating comes from the stars above.</p>
         <button type="submit" class="btn-gold">Save review</button>
       </form>
       {% else %}

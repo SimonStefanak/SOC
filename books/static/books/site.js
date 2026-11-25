@@ -57,6 +57,17 @@
     update();
   });
 
+  /* Phone: the book description is clamped to one line until "More" is tapped. */
+  var moreBtn = document.querySelector(".book__more");
+  if (moreBtn) {
+    var desc = document.getElementById("book-desc");
+    moreBtn.addEventListener("click", function () {
+      var clamped = desc.classList.toggle("is-clamped");
+      moreBtn.textContent = clamped ? "More" : "Less";
+      moreBtn.setAttribute("aria-expanded", String(!clamped));
+    });
+  }
+
   /* Nav gets a shadow once the page scrolls under it. */
   var nav = document.querySelector(".nav");
   if (nav) {

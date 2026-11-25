@@ -44,3 +44,13 @@
 - `RegisterForm` (in `forms.py`) requires an email that no other account uses (any capitalisation) and applies Django's password rules (8+ characters, not too common, not all numbers, not like the username).
 - After signing up the new account is logged in and taken back to where it came from (`?next=`), or the homepage. Off-site `next` links are ignored.
 - Auth styles from the mockup replaced the old login styles in `style.css`; form fields rise in like the rest of the site.
+
+## 25 Nov 2026 · Phone (responsive) design
+*Prompt:* Code the smartphone version from the phone mockups and CSS.
+- Below 760px the top bar keeps only the logo and avatar, and a fixed **bottom tab bar** takes over: Home, Search, To read, Calendar (instead of the mockup's "Diary"), Finished, with the current page highlighted. It sits above the iPhone home indicator.
+- **Book page** reflows into the phone layout: small cover beside the title and genres, full-width shelf, dates and rating rows, heart on the far right, description clamped to one line with **More / Less** (only shown when a book has a description). Hint now reads "Your rating comes from the stars above."
+- **Homepage**: compact "Currently reading" card (cover beside text, buttons across the card, review box hidden on phones), **See all** link next to "Finished this year", swipe-only carousels.
+- **To read / Finished / Liked**: stacked filters, two cards per row. Search results also two per row.
+- **Footer** collapses to three centred lines; calendar and log-in keep their phone rules.
+- The old phone rules in `style.css` were replaced by one new phone section; tab bar stays still during page transitions and its icons press in when tapped (`motion.css`).
+- Checked with headless Chrome screenshots (logged out and logged in). Open point: the **Liked** page has no tab, so on phones it is only reachable by URL.
