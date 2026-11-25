@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import UserBook
 
@@ -32,3 +34,20 @@ class ReviewForm(ShelfForm):
 
     def clean_review_text(self):
         return (self.cleaned_data.get("review_text") or "").strip()
+
+
+class RegisterForm(UserCreationForm):
+    """Create account: email (for password resets later), username, password twice.
+    Django's password rules from settings apply (8+ characters, not too common...)."""
+
+    email = forms.EmailField(max_length=254)
+
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()
+        fields = ["email", "username"]
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email

@@ -27,3 +27,20 @@
 - Created `notes/notes.md` (the notes), `notes/build_pdf.py` (turns them into a PDF) and `notes/BookLog-notes.pdf`.
 - Installed `reportlab` (makes the PDF) and `pypdfium2` (previews it) into the project's virtual environment. They are note-taking tools only; the site doesn't use them, so they are not in `requirements.txt`.
 - Added this recap of the earlier work, then one entry per prompt from here on.
+
+## 25 Nov 2026 · Settings from environment variables, HTTPS
+*Prompt:* Read SECRET_KEY, DEBUG and ALLOWED_HOSTS from environment variables (a local .env file), add STATIC_ROOT and HTTPS settings that switch on only when DEBUG is off.
+- `config/settings.py` now reads `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` from the environment, with a small built-in `.env` reader (no new package). Real environment variables win over the file.
+- DEBUG is off unless set; a missing secret key stops the site with a clear message instead of running with a weak one.
+- New local `.env` (fresh secret key, DEBUG on, localhost) and a commit-safe `.env.example` template. `.env` and `staticfiles/` are git-ignored.
+- `STATIC_ROOT = staticfiles/` for `collectstatic` (dry run found 137 files).
+- With DEBUG off: http redirects to https, secure login/CSRF cookies, HSTS at 1 hour (adjustable), optional proxy header via `DJANGO_BEHIND_HTTPS_PROXY`.
+- `check --deploy` still flags the console email backend (no email is sent by the site yet) and two HSTS options left off on purpose.
+
+## 25 Nov 2026 · Log in and Create account pages
+*Prompt:* Update the log in page and create a register page from the new design; "Forgot password?" should not go anywhere yet.
+- Log in page rebuilt from the mockup: centred form, serif heading, "Forgot password?" next to the password label (deliberately inactive for now), "No account? Create one" link. A failed log-in keeps the username and shows one friendly error.
+- New **Create account** page at `/accounts/register/`: email, username, password, confirm password, with the hints from the design; errors replace the hint under the field they belong to.
+- `RegisterForm` (in `forms.py`) requires an email that no other account uses (any capitalisation) and applies Django's password rules (8+ characters, not too common, not all numbers, not like the username).
+- After signing up the new account is logged in and taken back to where it came from (`?next=`), or the homepage. Off-site `next` links are ignored.
+- Auth styles from the mockup replaced the old login styles in `style.css`; form fields rise in like the rest of the site.

@@ -58,6 +58,7 @@
   --fs-h1: 36px;      /* shelf page heading */
   --fs-xl: 28px;      /* "Reviews" heading */
   --fs-hero: 32px;    /* currently-reading title */
+  --fs-display: 42px; /* log in / create account heading */
   --fs-score: 36px;   /* catalog rating number */
   --fs-2xl: 52px;     /* book title */
 
@@ -945,22 +946,75 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
 .link { text-decoration: underline; text-underline-offset: 2px; }
 .reviews__empty { margin: 0; color: var(--text-muted); }
 
-/* login page */
-.auth { flex: 1; padding: 50px 0 58px; background: var(--bg-hero); }
-.auth__title { margin: 0 0 var(--space-5); font-family: var(--font-serif); font-size: 40px; line-height: 1.1; }
-.auth__form { display: flex; flex-direction: column; gap: var(--space-2); max-width: 360px; }
-.auth__form label { margin-top: var(--space-2); font-size: var(--fs-xs); font-weight: 700; color: var(--text-strong); }
-.auth__form input {
+/* =========================================================
+   Auth pages (log in / create account), from the auth mockup
+   ========================================================= */
+.auth {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  min-height: 640px;
+  padding: var(--space-6) 0;
+  background: var(--bg-hero);
+}
+.auth__form { width: min(360px, 100vw - 2 * var(--gutter)); }
+
+.auth__title {
+  margin: 0 0 20px;
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-strong);
+}
+
+.field + .field { margin-top: 20px; }
+.field label {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 15px;
+  color: var(--text-strong);
+}
+/* password label with "Forgot password?" pushed to the right */
+.field__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.field__aside { font-size: var(--fs-sm); color: var(--text); text-decoration: underline; }
+.field__aside:hover { color: var(--text-strong); }
+
+.field input {
+  width: 100%;
   height: 40px;
+  margin-top: 7px;
   padding: 0 12px;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--mist);
-  color: #0d0d0e;
+  color: var(--gold-ink);
   font: inherit;
+  font-size: var(--fs-md);
 }
-.auth__form .btn-gold { margin-top: var(--space-4); }
-.form-error { margin: 0 0 var(--space-4); color: #ff8a80; }
+.field input::placeholder { color: var(--hint); opacity: 1; }
+/* the negative bottom margin keeps the gap after a hint equal to the gap after a bare input */
+.field__hint { margin: 6px 0 -4px; font-size: var(--fs-xs); line-height: 18px; color: var(--text-muted); }
+
+.auth__submit { width: 100%; margin-top: 20px; }
+.auth__alt { margin: 20px 0 0; font-size: var(--fs-md); line-height: 18px; color: var(--text-muted); }
+.auth__alt a { margin-left: 3px; font-weight: 700; color: var(--text-strong); text-decoration: underline; }
+
+/* ---- Django additions: form errors ---- */
+.form-error {
+  margin: 0 0 var(--space-4);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgb(179 38 30 / 0.18);
+  color: #ffb4ab;
+  font-size: var(--fs-md);
+  line-height: 18px;
+}
+.field__error { margin: 6px 0 -4px; font-size: var(--fs-xs); line-height: 18px; color: #ffb4ab; }
+.field input[aria-invalid="true"] { box-shadow: 0 0 0 2px #ff8a80; }
+/* "Forgot password?" goes nowhere yet */
+.field__aside[aria-disabled="true"] { cursor: default; }
 
 /* =========================================================
    Search page
@@ -1022,6 +1076,8 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .section__title--genres { margin-top: var(--space-6); }
   .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); }
   .search-hero { padding: var(--space-6) 0 var(--space-5); }
+  .auth { min-height: 0; padding: var(--space-6) 0 48px; }
+  .auth__title { font-size: var(--fs-hero); }
   .chips a, .chips span { height: 38px; padding: 0 16px; font-size: var(--fs-sm); }
 
   .shelf-page { padding: var(--space-5) 0 var(--space-6); }

@@ -65,7 +65,7 @@ body { text-rendering: optimizeLegibility; }
 .book-info > *,
 .current__body > *,
 .search-hero .container > *,
-.auth .container > *,
+.auth__form > *,
 .reviews__title,
 .section__title,
 .book-grid > li,

@@ -1,0 +1,62 @@
+{% extends "books/base.html" %}
+{% block title %}Create account{% endblock %}
+
+{% block content %}
+<section class="auth">
+  <form class="auth__form" method="post" action="{% url 'register' %}" novalidate>
+    {% csrf_token %}
+    <h1 class="auth__title">Create account</h1>
+
+    {% if form.non_field_errors %}
+    <p class="form-error" role="alert">{{ form.non_field_errors|join:" " }}</p>
+    {% endif %}
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ form.email.value|default_if_none:'' }}" placeholder="you@example.com"
+             autocomplete="email" required autofocus{% if form.email.errors %} aria-invalid="true" aria-describedby="email-error"{% endif %}>
+      {% if form.email.errors %}
+      <p class="field__error" id="email-error">{{ form.email.errors|join:" " }}</p>
+      {% else %}
+      <p class="field__hint">Only used to reset your password.</p>
+      {% endif %}
+    </div>
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" value="{{ form.username.value|default_if_none:'' }}"
+             autocomplete="username" maxlength="150" required{% if form.username.errors %} aria-invalid="true" aria-describedby="username-error"{% endif %}>
+      {% if form.username.errors %}
+      <p class="field__error" id="username-error">{{ form.username.errors|join:" " }}</p>
+      {% else %}
+      <p class="field__hint">Shown on your reviews.</p>
+      {% endif %}
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password1" autocomplete="new-password" minlength="8" required
+             {% if form.password1.errors %}aria-invalid="true" aria-describedby="password-error"{% endif %}>
+      {% if form.password1.errors %}
+      <p class="field__error" id="password-error">{{ form.password1.errors|join:" " }}</p>
+      {% else %}
+      <p class="field__hint">At least 8 characters.</p>
+      {% endif %}
+    </div>
+
+    <div class="field">
+      <label for="password2">Confirm password</label>
+      <input type="password" id="password2" name="password2" autocomplete="new-password" minlength="8" required
+             {% if form.password2.errors %}aria-invalid="true" aria-describedby="password2-error"{% endif %}>
+      {% if form.password2.errors %}
+      <p class="field__error" id="password2-error">{{ form.password2.errors|join:" " }}</p>
+      {% endif %}
+    </div>
+
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn-gold auth__submit">Create account</button>
+
+    <p class="auth__alt">Already have an account? <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Log in</a></p>
+  </form>
+</section>
+{% endblock %}

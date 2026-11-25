@@ -2,6 +2,7 @@ import re
 from datetime import date, timedelta
 
 from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator
@@ -9,10 +10,11 @@ from django.db.models import Count, F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.dateformat import format as format_date
 from django.views.decorators.http import require_POST
 
-from .forms import ReviewForm, ShelfForm
+from .forms import RegisterForm, ReviewForm, ShelfForm
 from .models import Book, Genre, UserBook
 
 
@@ -455,3 +457,29 @@ def calendar(request):
         "rows": rows,
         "has_books": bool(spans),
     })
+
+
+# ---------- Create account ----------
+
+def register(request):
+    """Sign-up page: creates the account, logs it in and goes back to where the
+    visitor came from (?next=...) or the homepage."""
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    next_url = request.POST.get("next") or request.GET.get("next") or ""
+    if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()},
+                                           require_https=request.is_secure()):
+        next_url = ""
+
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"Welcome to BookLog, {user.username}!")
+            return redirect(next_url or "home")
+    else:
+        form = RegisterForm()
+
+    return render(request, "registration/register.html", {"form": form, "next": next_url})

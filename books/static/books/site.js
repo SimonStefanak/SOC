@@ -19,7 +19,7 @@
   });
 
   /* Stagger entrance animations: each child gets its index as --i (see motion.css). */
-  document.querySelectorAll(".book-grid, .carousel__track, .shelf-grid, .review-list, .chips, .genres, .book-info, .current__body")
+  document.querySelectorAll(".auth__form, .book-grid, .carousel__track, .shelf-grid, .review-list, .chips, .genres, .book-info, .current__body")
     .forEach(function (list) {
       Array.prototype.forEach.call(list.children, function (child, i) {
         child.style.setProperty("--i", i);

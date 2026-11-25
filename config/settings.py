@@ -10,22 +10,71 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+# ---------------------------------------------------------------------------
+# Environment
+# Secrets and per-machine values come from environment variables. For local
+# work and simple servers they can live in a .env file next to manage.py
+# (see .env.example). Variables already set in the real environment win over
+# the file, so a server's own config always takes priority.
+# ---------------------------------------------------------------------------
+
+def _load_env_file(path):
+    if not path.exists():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip().removeprefix("export ").strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
+
+
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None or value.strip() == "":
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def env_list(name, default=""):
+    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
+
+
+_load_env_file(BASE_DIR / ".env")
+
+
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4c^*)7sfzu1_ecggexe0_#4gi31t30(#@lf50m90f1wcp7kkcb'
+# Off unless explicitly switched on, so a server that forgets to set it is safe.
+DEBUG = env_bool("DJANGO_DEBUG", default=False)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY is not set. Add it to the .env file next to manage.py "
+        "(copy .env.example) or set it as an environment variable."
+    )
 
-ALLOWED_HOSTS = []
+# Comma-separated, e.g. "booklog.example.com,www.booklog.example.com".
+# With DEBUG on and nothing set, Django still allows localhost by itself.
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
+
+# Comma-separated full origins, e.g. "https://booklog.example.com".
+# Needed for logins and forms once the site is served over HTTPS on a real domain.
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
 
 # Application definition
@@ -105,7 +154,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Bratislava'
 
 USE_I18N = True
 
@@ -116,6 +165,30 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Where `python manage.py collectstatic` gathers every CSS/JS/image file for the
+# web server to serve in production. Generated, so it is not kept in git.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# HTTPS
+# Switched on only when DEBUG is off, so local `runserver` keeps working over plain http.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=True)  # http -> https
+    SESSION_COOKIE_SECURE = True    # login cookie only travels over https
+    CSRF_COOKIE_SECURE = True       # form-protection cookie only travels over https
+
+    # HSTS: browsers remember to use https only. Starts at one hour; raise it
+    # (e.g. 31536000 = a year) once https is confirmed working on the domain.
+    SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_SECURE_HSTS_SECONDS", "3600"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=False)
+    SECURE_HSTS_PRELOAD = False
+
+    # Behind a proxy that ends https (nginx, Render, Railway, PythonAnywhere...),
+    # trust its X-Forwarded-Proto header. Only switch this on when such a proxy
+    # really sits in front, or anyone could fake "https".
+    if env_bool("DJANGO_BEHIND_HTTPS_PROXY", default=False):
+        SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Email
