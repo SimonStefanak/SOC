@@ -1,8 +1,45 @@
 {% extends "books/base.html" %}
+{% load book_extras %}
 {% block title %}Calendar · {{ title }}{% endblock %}
 
 {% block content %}
-<section class="cal-page">
+<section class="diary-page">
+  <!-- header band: page title + List / Calendar switch -->
+  <div class="diary-head">
+    <div class="container diary-head__inner">
+      <h1 class="shelf-title">Calendar</h1>
+      <nav class="seg" aria-label="View">
+        <a href="?view=list"{% if mode == "list" %} class="is-on" aria-current="page"{% endif %}>List</a>
+        <a href="?view=month"{% if mode == "grid" %} class="is-on" aria-current="page"{% endif %}>Calendar</a>
+      </nav>
+    </div>
+  </div>
+
+{% if mode == "list" %}
+  <div class="diary">
+    <div class="container">
+      {% if reading or groups %}
+      <div class="diary__head" aria-hidden="true">
+        <span>Day</span><span>Book</span><span>Read in</span><span>Rating</span><span>Like</span><span>Review</span>
+      </div>
+
+      {% if reading %}
+      <p class="diary__group diary__group--now">Reading now</p>
+      {% for row in reading %}{% include "books/calendar/_diary_row.html" with now=True %}{% endfor %}
+      {% endif %}
+
+      {% for group in groups %}
+      <p class="diary__group">{{ group.label }}</p>
+      {% for row in group.rows %}{% include "books/calendar/_diary_row.html" %}{% endfor %}
+      {% endfor %}
+      {% else %}
+      <p class="diary__empty">Nothing here yet. Set a book to “Reading” or mark one as finished and it will show up in your list.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="cal-page" aria-label="Calendar">
   <div class="container">
 
     <div class="cal__toolbar">
@@ -62,4 +99,6 @@
 
   </div>
 </section>
+</section>
+{% endif %}
 {% endblock %}

@@ -135,8 +135,9 @@ main { flex: 1; display: flex; flex-direction: column; }
   color: var(--text);
 }
 
-.nav__logo { justify-self: start; display: block; }
+.nav__logo { justify-self: start; display: flex; align-items: center; gap: 9px; color: var(--text-strong); }
 .nav__logo img { display: block; height: 34px; width: auto; }
+.nav__logo span { font-size: var(--fs-hero); font-weight: 700; }
 
 .nav__links {
   display: flex;
@@ -372,7 +373,7 @@ main { flex: 1; display: flex; flex-direction: column; }
 }
 .rate__star { width: 30px; height: 28px; }
 /* the heart is taller than the stars: it lines up with their bottom edge and rises above the row */
-.like { width: 37px; height: 34px; margin: -8px 0 2px; }
+.like { width: 37px; height: 34px; margin: -8px 0 2px; color: var(--heart); }   /* pale-blue outline until liked */
 
 .rate__star svg,
 .like svg {
@@ -650,7 +651,7 @@ main { flex: 1; display: flex; flex-direction: column; }
 .chips a:hover { background: rgb(242 245 249 / 0.1); }
 
 /* =========================================================
-   Shelf pages ("To read", "Finished")
+   Shelf pages ("Want", "Finished")
    ========================================================= */
 .shelf-page { flex: 1; background: var(--bg-hero); padding: 40px 0 64px; }
 
@@ -1043,6 +1044,109 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
 .pager__info { color: var(--text-muted); }
 
 /* =========================================================
+   Calendar page: header band + List view (the "Diary" design)
+   Measured from the Figma frames "Diary - desktop" and "Diary - phone".
+   ========================================================= */
+.diary-page { flex: 1; display: flex; flex-direction: column; background: var(--bg-hero); }
+.diary-head { padding: 30px 0 24px; }
+.diary-head__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+/* the month grid follows the header band directly */
+.diary-page .cal-page { padding-top: 0; }
+
+/* List / Calendar switch */
+.seg { display: inline-flex; gap: 2px; padding: 4px; border-radius: var(--radius-lg); background: var(--coal); }
+.seg > * {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+.seg > *:hover { color: var(--text-strong); }
+.seg .is-on,
+.seg .is-on:hover { background: var(--mist); color: var(--gold-ink); font-weight: 600; }
+
+/* the list: a full-width coal band, rows aligned to the page column */
+.diary { flex: 1; padding: 16px 0 13px; background: var(--coal); }
+
+.diary__head,
+.diary__row {
+  display: grid;
+  grid-template-columns: 72px 56px minmax(0, 1fr) 216px 136px 57px 53px;
+  align-items: center;
+}
+.diary__head {
+  height: 15px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--cal-dim);
+}
+.diary__head span:nth-child(2) { grid-column: span 2; }
+/* "Day" sits over the day numbers, so it shares their centering */
+.diary__head span:first-child { padding-right: 17px; text-align: center; }
+
+/* group heading with a rule running to the right of it */
+.diary__group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 16px;
+  margin: 7px 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.diary__group::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.diary__head + .diary__group { margin-top: 16px; }
+.diary__group--now { color: var(--gold); }
+
+.diary__row { height: 85px; border-bottom: 1px solid var(--rule); }
+.diary__row--last { border-bottom: 0; }
+
+.diary__day { margin: 0; padding-right: 17px; text-align: center; line-height: 1.1; }
+.diary__day strong { display: block; font-size: var(--fs-xl); font-weight: 700; color: var(--text-strong); }
+.diary__day span { font-size: var(--fs-xs); text-transform: uppercase; color: var(--text-muted); }
+
+/* in the diary the placeholder is a solid block, not the dashed outline */
+.diary__cover { --cover-w: 40px; border-width: 1px; border-color: var(--steel); border-radius: 2px; background: var(--neutral); }
+
+.diary__book { min-width: 0; }
+.diary__title { display: block; font-size: var(--fs-body); font-weight: 700; color: var(--text-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.diary__title:hover { text-decoration: underline; }
+.diary__author { margin: 4px 0 0; font-size: var(--fs-md); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.diary__dates { margin: 0; font-size: var(--fs-md); color: var(--text-muted); }
+.diary__dates--now { color: var(--gold); }
+
+/* same star component, but with air around each glyph */
+.diary__row .stars {
+  --size: 18px;
+  color: var(--gold);
+  --star-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-3.5 -3.5 31 31'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --star-fill: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-3.5 -3.5 31 31'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+/* the two icons line up under the centre of their column headings */
+.diary__like { display: inline-grid; place-items: center; width: 16px; height: 16px; margin-left: 6px; color: var(--gold); }
+.diary__like svg { width: 16px; height: 16px; fill: currentColor; }
+.diary__review { display: inline-grid; place-items: center; width: 14px; height: 14px; margin-left: 18px; color: var(--text); }
+.diary__review:hover { color: var(--text-strong); }
+.diary__review svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.diary__empty { margin: 16px 0; color: var(--text-muted); }
+
+/* =========================================================
    Phone tab bar + phone-only affordances
    Hidden above the phone breakpoint; the rules that show them are below.
    ========================================================= */
@@ -1076,6 +1180,7 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .nav__links,
   .nav__icon { display: none; }
   .nav__logo img { height: 34px; }
+  .nav__logo span { display: none; }   /* no phone mockup for the wordmark yet */
   .nav__avatar { width: 32px; height: 32px; background: var(--avatar-bg); color: var(--mist); }
   .nav__avatar svg { width: 18px; height: 18px; }
 
@@ -1129,7 +1234,7 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .shelf .cover { grid-area: 1 / 1 / 3 / 2; --cover-w: 112px; }
   .book__head { grid-area: 1 / 2 / 2 / 3; }
   .genres { grid-area: 2 / 2 / 3 / 3; align-self: start; margin: 6px 0 0; }
-  .status,
+  .status { grid-area: 3 / 1 / 4 / 3; margin-top: 20px; }
   .shelf__login { grid-area: 3 / 1 / 4 / 3; margin-top: 20px; }
   .shelf__field:not(.shelf__field--rating) { grid-area: 4 / 1 / 5 / 3; margin-top: 14px; }
   .shelf__field--rating { grid-area: 5 / 1 / 6 / 3; margin-top: 13px; }
@@ -1196,7 +1301,41 @@ a.btn-gold { display: inline-flex; align-items: center; justify-content: center;
   .chips a,
   .chips span { height: 32px; padding: 0 13px; font-size: var(--fs-sm); }
 
-  /* ---- shelf pages (To read, Finished, Liked) ---- */
+  /* ---- calendar list view ("diary"): one slate page, rows stacked ---- */
+  .diary-head { padding: 24px 0 0; }
+  .diary-page .cal-page { padding-top: var(--space-5); }
+  .diary { padding: 0 0 26px; background: none; }
+  .diary__head { display: none; }
+  .diary__head + .diary__group,
+  .diary__group { margin-top: 20px; }
+  /* day | cover | everything else stacked in the third column */
+  .diary__row {
+    grid-template-columns: 52px 53px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 0;
+    align-items: start;
+    align-content: start;
+    height: auto;
+    padding: 14px 0;
+  }
+  .diary__day { grid-row: 1 / -1; padding-right: 0; text-align: left; }
+  .diary__day strong { font-size: var(--fs-byline); }
+  .diary__cover { grid-row: 1 / -1; }
+  .diary__none { display: none; }
+  .diary__book { grid-column: 3; grid-row: 1; }
+  .diary__title { line-height: 19px; }
+  .diary__author { margin-top: 2px; line-height: 16px; }
+  .diary__dates { grid-column: 3; grid-row: 2; margin-top: 2px; line-height: 16px; }
+  /* the heart and review icon sit on the same line as the stars */
+  .diary__row .stars { grid-column: 3; grid-row: 3; --size: 16px; margin-top: 6px; }
+  .diary__like { grid-column: 3; grid-row: 3; justify-self: start; margin: 6px 0 0 84px; }
+  .diary__review { grid-column: 3; grid-row: 3; justify-self: start; margin: 7px 0 0 108px; }
+  /* rows without stars: the icons move to the start of the line */
+  .diary__row:not(:has(.stars)) .diary__like { margin-left: 0; }
+  .diary__row:not(:has(.stars)) .diary__review { margin-left: 24px; }
+  .diary__row:not(:has(.stars)):not(:has(.diary__like)) .diary__review { margin-left: 0; }
+
+  /* ---- shelf pages (Want, Finished, Liked) ---- */
   .shelf-page { padding: 24px 0 26px; }
   .shelf-title { font-size: 34px; line-height: 1.15; }
   .filters { width: 100%; gap: var(--space-2); margin-top: 20px; }

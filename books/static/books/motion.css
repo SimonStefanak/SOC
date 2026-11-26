@@ -69,6 +69,8 @@ body { text-rendering: optimizeLegibility; }
 .reviews__title,
 .section__title,
 .book-grid > li,
+.diary__row,
+.diary__group,
 .carousel__track > li,
 .shelf-grid > li,
 .shelf-head,
@@ -244,6 +246,14 @@ body { text-rendering: optimizeLegibility; }
 .carousel__btn:not(:disabled):active { transform: scale(0.92); transition-duration: var(--dur-1); }
 .carousel__btn:focus-visible { outline: none; box-shadow: var(--ring); }
 
+/* calendar list: rows brighten a touch on hover; switch eases between views */
+.diary__row { transition: background-color var(--ease); }
+.diary__row:hover { background: rgb(255 255 255 / 0.025); }
+.seg > * { transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out); }
+.seg > *:focus-visible { outline: none; box-shadow: var(--ring); }
+.diary__review { transition: color var(--ease), transform var(--dur-2) var(--ease-spring); }
+.diary__review:hover { transform: scale(1.15); }
+
 /* calendar: bars draw in from their start day, buttons respond like the rest */
 @keyframes bar-in { from { clip-path: inset(0 100% 0 0 round 4px); } }
 .cal__bar {
@@ -380,6 +390,7 @@ body { text-rendering: optimizeLegibility; }
 
 /* gold star displays: reviews, finished-shelf cards */
 .review .stars,
+.diary__row .stars,
 .tbr-card__stars { filter: drop-shadow(0 0 3px rgb(var(--glow-rgb) / 0.45)); }
 
 /* gold text: "Currently reading", card ratings */

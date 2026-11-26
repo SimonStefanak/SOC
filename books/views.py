@@ -111,7 +111,7 @@ def search(request):
 SHELVES = {
     "to_read": {
         "filter": {"status": UserBook.Status.TO_READ},
-        "title": "To read",
+        "title": "Want",
         "date_field": "added_at",        # a DateTimeField
         "date_label": "Date added",
         "card_label": "Added",
@@ -121,7 +121,7 @@ SHELVES = {
             ("title", "Title, A–Z", ["book__title"]),
             ("author", "Author, A–Z", ["book__author", "book__title"]),
         ],
-        "empty": "Nothing on your to-read shelf yet. Find a book and set it to “To read”.",
+        "empty": "Nothing on your Want shelf yet. Find a book and set it to “Want”.",
     },
     "finished": {
         "filter": {"status": UserBook.Status.READ},
@@ -316,9 +316,9 @@ def book(request, book_id):
         "series_books": series_books,
         "genres": book.genres.order_by("-bookgenre__tag_count")[:3],
         "entry": entry,
-        "status_choices": UserBook.Status.choices,
         "dates_step": dates_step,
         "reviews": reviews,
+        "status_choices": UserBook.Status.choices,
     })
 
 
@@ -407,8 +407,57 @@ def _lay_out_row(days, spans):
     return bars
 
 
+def _span_text(first, last):
+    """'4 – 19 Nov', '28 Oct – 6 Nov', '28 Dec 2025 – 3 Jan 2026'."""
+    if first.year != last.year:
+        return f"{format_date(first, 'j M Y')} – {format_date(last, 'j M Y')}"
+    if first.month != last.month:
+        return f"{format_date(first, 'j M')} – {format_date(last, 'j M')}"
+    return f"{first.day} – {format_date(last, 'j M')}"
+
+
+def _calendar_list(request):
+    """The list view of the Calendar page (the "Diary" design): what you're
+    reading now, then finished books grouped by the month you finished them."""
+    today = timezone.localdate()
+    mine = UserBook.objects.filter(user=request.user).select_related("book")
+
+    reading = []
+    for e in mine.filter(status=UserBook.Status.READING).order_by(F("date_started").desc(nulls_last=True)):
+        if e.date_started:
+            days = (today - e.date_started).days + 1
+            text = f"Started {format_date(e.date_started, 'j M')} · day {days}"
+        else:
+            text = "No start date"
+        reading.append({"entry": e, "day": e.date_started, "dates": text})
+
+    groups = []
+    finished = mine.filter(status=UserBook.Status.READ).order_by(F("date_finished").desc(nulls_last=True), "-updated_at")
+    for e in finished:
+        if e.date_finished and e.date_started and e.date_started <= e.date_finished:
+            days = (e.date_finished - e.date_started).days + 1
+            text = f"{_span_text(e.date_started, e.date_finished)} · {days} day{'s' if days != 1 else ''}"
+        elif e.date_finished:
+            text = "No start date"
+        else:
+            text = "No dates"
+        label = format_date(e.date_finished, "F Y") if e.date_finished else "No finish date"
+        if not groups or groups[-1]["label"] != label:
+            groups.append({"label": label, "rows": []})
+        groups[-1]["rows"].append({"entry": e, "day": e.date_finished, "dates": text})
+
+    return render(request, "books/calendar/index.html", {
+        "mode": "list",
+        "reading": reading,
+        "groups": groups,
+        "title": "Your reading",
+    })
+
+
 @login_required
 def calendar(request):
+    if request.GET.get("view") == "list":
+        return _calendar_list(request)
     today = timezone.localdate()
     view = request.GET.get("view", "")
     if view not in dict(CAL_VIEWS):
@@ -446,6 +495,7 @@ def calendar(request):
         weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     return render(request, "books/calendar/index.html", {
+        "mode": "grid",
         "view": view,
         "views": CAL_VIEWS,
         "title": title,

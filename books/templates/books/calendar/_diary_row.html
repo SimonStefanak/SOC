@@ -1,0 +1,13 @@
+{% load book_extras %}
+<article class="diary__row{% if forloop.last %} diary__row--last{% endif %}">
+  {% if row.day %}<p class="diary__day"><strong>{{ row.day.day }}</strong><span>{{ row.day|date:"D" }}</span></p>{% else %}<p class="diary__day"><strong>–</strong></p>{% endif %}
+  <div class="cover diary__cover" style="view-transition-name: cover-{{ row.entry.book_id }}">{% if row.entry.book.image_url %}<img src="{{ row.entry.book.small_image_url|default:row.entry.book.image_url }}" alt="" loading="lazy">{% endif %}</div>
+  <div class="diary__book">
+    <a class="diary__title" href="{% url 'book' row.entry.book_id %}" title="{{ row.entry.book.title }}">{{ row.entry.book.title|short_title }}</a>
+    <p class="diary__author">{{ row.entry.book.author }}</p>
+  </div>
+  <p class="diary__dates{% if now %} diary__dates--now{% endif %}">{{ row.dates }}</p>
+  {% if row.entry.rating %}<span class="stars" style="--rating: {{ row.entry.rating }}" role="img" aria-label="{{ row.entry.rating }} out of 5 stars"></span>{% else %}<span class="diary__none"></span>{% endif %}
+  {% if row.entry.favorite %}<span class="diary__like" role="img" aria-label="Liked"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.1l-1.4-1.3C5.5 15.2 2.2 12.2 2.2 8.5 2.2 5.5 4.6 3.1 7.6 3.1c1.7 0 3.3.8 4.4 2 1.1-1.2 2.7-2 4.4-2 3 0 5.4 2.4 5.4 5.4 0 3.7-3.3 6.7-8.4 11.3z"/></svg></span>{% else %}<span class="diary__none"></span>{% endif %}
+  {% if row.entry.review_text %}<a class="diary__review" href="{% url 'book' row.entry.book_id %}#reviews" aria-label="Read your review" title="Read your review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h11"/></svg></a>{% else %}<span class="diary__none"></span>{% endif %}
+</article>

@@ -78,7 +78,7 @@ class UserBook(models.Model):
     """One row per (user, book): reading status, dates, rating and review."""
 
     class Status(models.TextChoices):
-        TO_READ = "to_read", "To read"
+        TO_READ = "to_read", "Want"
         READING = "reading", "Reading"
         READ = "read", "Finished"
 

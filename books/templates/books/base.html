@@ -26,12 +26,12 @@
   </svg>
 
   <header class="nav">
-    <a class="nav__logo" href="{% url 'home' %}" aria-label="Home"><img src="{% static 'books/logo.svg' %}" alt=""></a>
+    <a class="nav__logo" href="{% url 'home' %}" aria-label="BookLog home"><img src="{% static 'books/logo.svg' %}" alt=""><span>BookLog.</span></a>
 
     <nav aria-label="Main">
       <ul class="nav__links">
         {% url 'to_be_read' as to_read_url %}
-        <li><a href="{{ to_read_url }}"{% if request.path == to_read_url %} aria-current="page"{% endif %}>To read</a></li>
+        <li><a href="{{ to_read_url }}"{% if request.path == to_read_url %} aria-current="page"{% endif %}>Want</a></li>
         {% url 'calendar' as calendar_url %}
         <li><a href="{{ calendar_url }}"{% if request.path == calendar_url %} aria-current="page"{% endif %}>Calendar</a></li>
         {% url 'finished' as finished_url %}
@@ -85,7 +85,7 @@
           <div>
             <h2 class="footer__heading">Your books</h2>
             <ul class="footer__links">
-              <li><a href="{% url 'to_be_read' %}">To read</a></li>
+              <li><a href="{% url 'to_be_read' %}">Want</a></li>
               <li><a href="{% url 'calendar' %}">Calendar</a></li>
               <li><a href="{% url 'finished' %}">Finished</a></li>
               <li><a href="{% url 'liked' %}">Liked</a></li>
@@ -113,7 +113,7 @@
   <nav class="tabbar" aria-label="Sections">
     <a href="{{ home_url }}"{% if request.path == home_url %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.6 12 3.5l8.5 7.1V20a1 1 0 0 1-1 1h-4.6v-5.8H9.1V21H4.5a1 1 0 0 1-1-1z"/></svg></span>Home</a>
     <a href="{{ search_url }}"{% if request.path == search_url %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></span>Search</a>
-    <a href="{{ tab_to_read }}"{% if request.path == tab_to_read %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3h11v18l-5.5-4.2L6.5 21z"/></svg></span>To read</a>
+    <a href="{{ tab_to_read }}"{% if request.path == tab_to_read %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3h11v18l-5.5-4.2L6.5 21z"/></svg></span>Want</a>
     <a href="{{ tab_calendar }}"{% if request.path == tab_calendar %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/></svg></span>Calendar</a>
     <a href="{{ tab_finished }}"{% if request.path == tab_finished %} aria-current="page"{% endif %}><span class="tabbar__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="m8.3 12.2 2.6 2.6 4.8-5.2"/></svg></span>Finished</a>
   </nav>
